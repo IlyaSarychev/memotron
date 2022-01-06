@@ -118,7 +118,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Настройки медиа
 
 MEDIA_ROOT = BASE_DIR / 'media/'
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 
 
 # Указание внутренних адресов для debug toolbar
@@ -126,3 +126,8 @@ MEDIA_URL = 'media/'
 INTERNAL_IPS = [
     '127.0.0.1'
 ]
+
+
+# Логин, логаут настройки
+LOGIN_REDIRECT_URL = '/account/profile/'
+LOGIN_URL = LOGOUT_REDIRECT_URL = '/account/login/'
