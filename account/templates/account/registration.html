@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Регистрация{% endblock %}
+
+{% block content %}
+
+<main>
+    <div class="container">
+        <div class="row mt-5">
+            <div class="col-lg-6 offset-lg-3">
+                <h1>Регистрация</h1>
+                <p class="mb-5">Введите свои данные в форму ниже:</p>
+                <form action="." method="post" class="mb-5">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label" for="{{field.id_for_label}}">{{field.label}}</label>
+                            {{field}}
+
+                            {% if field.errors %}
+                                <div class="invalid-feedback">
+                                    {{field.errors.0}}
+                                </div>
+                            {% endif %}
+
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock %}
