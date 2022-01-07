@@ -1,7 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from .forms import AccountLoginForm, AccountRegistrationForm
+from .models import Profile
 
 
 @login_required
@@ -21,7 +22,13 @@ def account_register_new_user(request):
         form = AccountRegistrationForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            print(cd)
+            user = form.save(commit=False)
+
+            user.set_password(cd['password1'])
+            user.save()
+            Profile.objects.create(user=user, name=cd['first_name'])
+            
+            return redirect('account:account_profile')
         else:
             return render(request, 'account/registration.html', {'form': form})
     else:

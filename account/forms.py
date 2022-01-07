@@ -33,8 +33,6 @@ class AccountRegistrationForm(forms.ModelForm):
     password2 = forms.CharField(label='Повторите пароль', 
                                 widget=forms.PasswordInput())
 
-    error_css_class = 'is-invalid'
-
     class Meta:
         model = User
         fields = ('username', 'first_name', 'email')
@@ -61,3 +59,11 @@ class AccountRegistrationForm(forms.ModelForm):
             raise ValidationError('Такое имя уже существует')
 
         return self.cleaned_data['username']
+
+    def clean_password2(self):
+        password2 = self.cleaned_data['password2']
+
+        if password2 != self.cleaned_data['password1']:
+            raise ValidationError('Пароли не совпадают')
+
+        return password2
