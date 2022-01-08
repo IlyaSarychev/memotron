@@ -1,14 +1,17 @@
 from django.shortcuts import redirect, render
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
 from .forms import AccountLoginForm, AccountRegistrationForm
 from .models import Profile
 
 
 @login_required
-def account_profile(request):
+def account_profile(request, profile_id):
     '''Вью для страницы профиля'''
-    return render(request, 'account/profile/detail.html')
+    profile = get_object_or_404(Profile, id=profile_id)
+    return render(request, 'account/profile/detail.html',
+                            {'profile': profile})
 
 
 class LoginView(auth_views.LoginView):
