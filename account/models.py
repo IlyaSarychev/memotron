@@ -6,7 +6,7 @@ class Profile(models.Model):
                                 related_name='profile')
     photo = models.ImageField(
                             verbose_name='Аватар профиля', 
-                            upload_to='media/%Y/%m/%d/',
+                            upload_to='profile/%Y/%m/%d/',
                             null=True,
                             blank=True)
     name = models.CharField('Имя', max_length=100)

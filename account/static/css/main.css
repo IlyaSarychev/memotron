@@ -1,0 +1,49 @@
+/* Profile */
+
+.profile-photo-wrapper {
+    position: relative;
+}
+
+.profile-photo {
+    display: block;
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+    object-position: center;
+}
+
+.profile-photo-form {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.profile-photo-upload {
+    display: none;
+}
+
+.profile-photo-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,.3);
+    cursor: pointer;
+    transition: .3s;
+    opacity: 0;
+}
+
+.profile-photo-wrapper:hover .profile-photo-label {
+    opacity: 1;
+}
+
+.profile-photo-label > img {
+    display: block;
+    width: 30%;
+}

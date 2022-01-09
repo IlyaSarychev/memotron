@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load thumbnail %}
 
 {% block title %}Профиль{% endblock %}
 
@@ -7,10 +9,35 @@
     <div class="container">
         <div class="row mt-5">
             <div class="col-md-4">
-                
+                {% if profile.photo %}
+                    {% thumbnail profile.photo "350x350" crop="center" as im %}
+                        <div class="profile-photo-wrapper">
+                            <img class="profile-photo" src="{{ im.url }}" alt="Profile photo">
+                            {% if profile.id == request.user.profile.id %}
+                            <form class="profile-photo-form" action="." method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <label for="profile_photo_img" class="profile-photo-label">
+                                    <img src="{% static 'img/upload-photo.svg' %}" alt="">
+                                </label>
+                                <input type="file" id="profile_photo_img" class="profile-photo-upload">
+                            </form>
+                            {% endif %}
+                        </div>
+                    {% endthumbnail %}
+                {% else %}
+                    <img class="profile-photo" src="{% static 'img/no_profile_picture.png' %}" alt="No photo">
+                {% endif %}
             </div>
             <div class="col-md-8"></div>
         </div>
     </div>
 </main>
+{% endblock %}
+
+{% block js_scripts_before %}
+
+<script>
+    window.imgChangeURL = "{% url 'account:profile_change_photo' %}"
+</script>
+
 {% endblock %}

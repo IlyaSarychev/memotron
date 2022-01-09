@@ -67,3 +67,9 @@ class AccountRegistrationForm(forms.ModelForm):
             raise ValidationError('Пароли не совпадают')
 
         return password2
+
+
+class UploadFileForm(forms.Form):
+    '''Базовая форма для загрузки файла'''
+    filename = forms.CharField(max_length=50)
+    file = forms.FileField()
