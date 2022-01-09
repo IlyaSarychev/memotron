@@ -1,6 +1,11 @@
-from django.http.response import HttpResponse
+import os
+
+from pathlib import Path
+
+from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
-from django.contrib.auth import forms, views as auth_views
+from django.conf import settings
+from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.shortcuts import get_object_or_404
@@ -50,13 +55,18 @@ def profile_change_photo(request):
     if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
         form = UploadFileForm(data=request.POST, files=request.FILES)
         if form.is_valid():
-            cd = form.cleaned_data
             profile = Profile.objects.get(id=request.user.profile.id)
+
+            # Удалить текущее фото
+            if profile.photo:
+                os.remove(profile.photo.path)
+
             profile.photo = request.FILES.get('file')
             profile.save()
-            return HttpResponse('Валидно')
+            return JsonResponse({
+                'url': profile.photo.url
+            })
         else:
-            print(form.errors)
-            return HttpResponse('Не валидно')
+            return HttpResponse('Что-то пошло не так')
     else:
         return HttpResponseForbidden()

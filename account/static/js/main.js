@@ -29,7 +29,7 @@ $(document).ready(function() {
                 processData: false,
                 contentType: false,
                 success(res) {
-                    console.log(res)
+                    $('.profile-photo').attr('src', res.url)
                 }
             })
         } else {
