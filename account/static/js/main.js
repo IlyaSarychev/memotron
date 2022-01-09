@@ -29,7 +29,11 @@ $(document).ready(function() {
                 processData: false,
                 contentType: false,
                 success(res) {
-                    $('.profile-photo').attr('src', res.url)
+                    if (res.error) {
+                        console.log('Ошибка запроса')
+                    } else {
+                        $('.profile-photo').attr('src', res.url)
+                    }
                 }
             })
         } else {

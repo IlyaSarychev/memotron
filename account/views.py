@@ -1,37 +1,28 @@
-import os
-
-from pathlib import Path
-
-from django.http.response import HttpResponse, JsonResponse
+from django.http.response import JsonResponse
 from django.shortcuts import redirect, render
-from django.conf import settings
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseForbidden
-from .forms import AccountLoginForm, AccountRegistrationForm, UploadFileForm
+from .forms import AccountLoginForm, AccountRegistrationForm
 from .models import Profile
+from .services.registration import register_new_user
+from .services.profile import change_profile_photo
+from .services.utils.ajax import is_ajax
 
 
 class LoginView(auth_views.LoginView):
-    '''Вью для страницы входа'''
+    '''Страница входа'''
     authentication_form = AccountLoginForm
 
 
 def account_register_new_user(request):
-    '''Вью для страницы регистрации'''
+    '''Страница регистрации'''
     if request.method == 'POST':
-        # Регистрация пользователя
         form = AccountRegistrationForm(request.POST)
-        if form.is_valid():
-            cd = form.cleaned_data
-            user = form.save(commit=False)
-
-            user.set_password(cd['password1'])
-            user.save()
-            Profile.objects.create(user=user, name=cd['first_name'])
-            
+        success = register_new_user(form)
+        if success:
             return redirect('account:account_profile')
         else:
             return render(request, 'account/registration.html', {'form': form})
@@ -43,7 +34,7 @@ def account_register_new_user(request):
 
 @login_required
 def account_profile(request, profile_id):
-    '''Вью для страницы профиля'''
+    '''Страница профиля'''
     profile = get_object_or_404(Profile, id=profile_id)
     return render(request, 'account/profile/detail.html',
                             {'profile': profile})
@@ -51,22 +42,12 @@ def account_profile(request, profile_id):
 
 @require_POST
 def profile_change_photo(request):
-    '''Вью для изменения фото профиля'''
-    if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
-        form = UploadFileForm(data=request.POST, files=request.FILES)
-        if form.is_valid():
-            profile = Profile.objects.get(id=request.user.profile.id)
-
-            # Удалить текущее фото
-            if profile.photo:
-                os.remove(profile.photo.path)
-
-            profile.photo = request.FILES.get('file')
-            profile.save()
-            return JsonResponse({
-                'url': profile.photo.url
-            })
+    '''Изменение фото профиля из ajax-запроса'''
+    if is_ajax(request):
+        success, profile = change_profile_photo(request)
+        if success:
+            return JsonResponse({'url': profile.photo.url})
         else:
-            return HttpResponse('Что-то пошло не так')
+            return JsonResponse({'error': 'Что-то пошло не так'})
     else:
         return HttpResponseForbidden()
