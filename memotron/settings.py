@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'sorl.thumbnail',
 
     'account.apps.AccountConfig',
+    'game.apps.GameConfig',
 ]
 
 MIDDLEWARE = [

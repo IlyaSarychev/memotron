@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Мои вопросы{% endblock %}
+
+{% block content %}
+<main>
+    <div class="container">
+        <div class="row mt-5">
+            <div class="d-flex align-items-center mb-4">
+                <h1 class="my-0">Мои вопросы</h1>
+                <span class="ms-4 pt-3">Всего вопросов: {{ questions_list.count }}</span>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Вопрос</th>
+                        <th>Опубликован</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for q in questions_list %}
+                        <tr>
+                            <th><span>{{ forloop.counter }}</span></th>
+                            <td><span>{{ q.text }}</span></td>
+                            <td>
+                                {% if q.is_published %}
+                                    <span>Да</span>
+                                {% else %}
+                                    <span>Нет</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3">Ничего нет</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+{% endblock %}
