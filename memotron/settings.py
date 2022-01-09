@@ -1,7 +1,16 @@
+import os
+
 from pathlib import Path
+from dotenv import load_dotenv
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+# загрузка переменных среды из .env файла в корне
+dotenv_path = BASE_DIR / '.env'
+load_dotenv(dotenv_path)
 
 
 # Quick-start development settings - unsuitable for production
@@ -67,9 +76,17 @@ WSGI_APPLICATION = 'memotron.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.environ.get('db_name'),
+        'USER': os.environ.get('db_user'),
+        'PASSWORD': os.environ.get('db_password'),
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
     }
 }
 

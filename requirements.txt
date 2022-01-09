@@ -8,7 +8,9 @@ lazy-object-proxy==1.7.1
 mccabe==0.6.1
 Pillow==9.0.0
 platformdirs==2.4.1
+psycopg2==2.9.3
 pylint-plugin-utils==0.7
+python-dotenv==0.19.2
 sorl-thumbnail==12.7.0
 sqlparse==0.4.2
 toml==0.10.2
