@@ -9,6 +9,5 @@ class Profile(models.Model):
                             upload_to='profile/%Y/%m/%d/',
                             null=True,
                             blank=True)
-    name = models.CharField('Имя', max_length=100)
     birth_date = models.DateTimeField('Дата рождения', null=True, blank=True)
 
