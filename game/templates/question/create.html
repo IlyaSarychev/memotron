@@ -27,7 +27,7 @@
                             <div class="mb-3">
                                 <label for="{{ field.auto_id }}" class="form-label">{{field.label}}</label>
                                 {{field}}
-                                {{field.errors}}
+                                <div class="invalid-feedback"></div>
                             </div>
                         {% endif %}
                     {% endfor %}
@@ -73,7 +73,16 @@
             })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data)
+
+                    $(this).find('input, textarea').each(function(i, el) {
+                        $(el).removeClass('is-invalid')
+                    })
+                    
+                    Object.keys(data.error).forEach(function(key) {
+                        const field = questionForm.find(`[name="${key}"]`)
+                        field.addClass('is-invalid')
+                        field.next('.invalid-feedback').text(data.error[key][0])
+                    })
                 })
         })
     })
