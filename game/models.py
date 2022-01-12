@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinLengthValidator
 
 
 class Question(models.Model):
@@ -7,7 +8,8 @@ class Question(models.Model):
     user = models.ForeignKey('auth.user', 
                              on_delete=models.CASCADE, 
                              related_name='questions')
-    text = models.TextField('Текст вопроса')
+    text = models.TextField('Текст вопроса',
+                             validators=[MinLengthValidator(20)])
     created = models.DateTimeField('Дата создания', 
                                     auto_now_add=True)
     updated = models.DateTimeField('Дата обновления',

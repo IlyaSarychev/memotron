@@ -8,7 +8,7 @@
         <div class="row mt-5">
             <div class="col-md-6">
                 <h2 class="mb-4">Создать вопрос</h2>
-                <form action="#" method="post">
+                <form id="questionForm" action="{% url 'game:ajax_create_question' %}" method="post">
                     {% csrf_token %}
                     {% for field in question_form.visible_fields %}
                         {% if field.is_checkbox %}
@@ -40,4 +40,42 @@
         </div>
     </div>
 </main>
+{% endblock %}
+
+{% block js_scripts_after %}
+<script>
+    $(document).ready(function() {
+        
+        questionForm = $('#questionForm')
+
+        questionForm.submit(function(e) {
+            e.preventDefault()
+            
+            const formData = new FormData($(this).get(0))
+            let data = {}
+
+            formData.forEach((value, name) => {
+                if  (value == 'on' || value == 'off') {
+                    data[name] = (value == 'on' ? true : false) 
+                } else {
+                    data[name] = value
+                }
+            })
+
+            fetch($(this).attr('action'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': data['csrfmiddlewaretoken'],
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                })
+        })
+    })
+</script>
 {% endblock %}

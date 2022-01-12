@@ -1,8 +1,16 @@
+import json
+
+from django.core.exceptions import ValidationError
+from django.http.response import JsonResponse
 from django.shortcuts import render
 from django.views.generic import ListView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from django.http import HttpResponseForbidden
 
+from account.services.utils.ajax import is_ajax
+from .services.questions import create_question
 from .models import Question
 from .forms import CreateQuestionForm
 
@@ -36,3 +44,39 @@ def create_question_or_answer_view(request):
     
     return render(request, 'question/create.html',
                   {'question_form': question_form})
+
+
+@require_POST
+@login_required
+def ajax_create_question(request):
+    '''Обработка AJAX-запроса на добавление вопроса'''
+
+    if is_ajax(request):
+        import json
+
+        data = json.loads(request.body)
+
+        try:
+            q = create_question(data.get('text'), 
+                                data.get('is_published'), 
+                                request.user)
+            return JsonResponse(
+                {
+                    'success': True,
+                    'question': {
+                        'id': q.id,
+                        'text': q.text,
+                        'is_published': q.is_published,
+                        'created': q.created
+                    }
+                }
+            )
+        except ValidationError as err:
+            return JsonResponse(
+                {
+                    'success': False,
+                    'error': err.message_dict
+                }
+            )
+    else:
+        return HttpResponseForbidden()
