@@ -13,11 +13,6 @@
                     {% for field in question_form.visible_fields %}
                         {% if field.is_checkbox %}
                             <div class="form-check mb-3">
-                                <!-- <input class="form-check-input" 
-                                    type="checkbox" 
-                                    value="1" 
-                                    id="{{flexCheckDefault}}"
-                                > -->
                                 {{field}}
                                 <label class="form-check-label" for="{{field.auto_id}}">
                                     {{field.label}}
@@ -52,14 +47,16 @@
             e.preventDefault()
             
             const formData = new FormData($(this).get(0))
+
             let data = {}
 
             formData.forEach((value, name) => {
-                if  (value == 'on' || value == 'off') {
-                    data[name] = (value == 'on' ? true : false) 
-                } else {
-                    data[name] = value
-                }
+                data[name] = value
+            })
+
+            const checkbox = $(this).find('input[type=checkbox]')
+            checkbox.each(function(i, el) {
+                data[$(el).attr('name')] = $(this).is(':checked')
             })
 
             fetch($(this).attr('action'), {
@@ -78,11 +75,17 @@
                         $(el).removeClass('is-invalid')
                     })
                     
-                    Object.keys(data.error).forEach(function(key) {
-                        const field = questionForm.find(`[name="${key}"]`)
-                        field.addClass('is-invalid')
-                        field.next('.invalid-feedback').text(data.error[key][0])
-                    })
+                    if (data.hasOwnProperty('error')) {
+                        Object.keys(data.error).forEach(function(key) {
+                            const field = questionForm.find(`[name="${key}"]`)
+                            field.addClass('is-invalid')
+                            field.next('.invalid-feedback').text(data.error[key][0])
+                        })
+                    }
+
+                    if (data.success) {
+                        $(this).get(0).reset()
+                    }
                 })
         })
     })
