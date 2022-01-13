@@ -8,7 +8,7 @@
         <div class="row mt-5">
             <div class="d-flex align-items-center mb-4">
                 <h1 class="my-0">Мои вопросы</h1>
-                <span class="ms-4 pt-3">Всего вопросов: {{ questions_list.count }}</span>
+                <p class="ms-4 mb-0 pt-3">Всего вопросов: <span class="count">{{ questions_list.count }}</span></p>
             </div>
             <table class="table">
                 <thead>
@@ -71,6 +71,7 @@
                 .then(data => {
                     if (data.success) {
                         $(this).closest('tr').remove()
+                        $('.count').text(Number($('.count').text() - 1))
                     }
                 })
         })

@@ -11,7 +11,7 @@ from django.http import HttpResponseForbidden
 
 from account.services.utils.ajax import is_ajax
 from .services.questions import create_question, delete_users_question
-from .models import Question
+from .models import Answer, Question
 from .forms import CreateQuestionForm
 
 
@@ -27,6 +27,25 @@ class MyQuestionListView(ListView):
     def get_queryset(self):
         '''Взять только вопросы пользователя'''
         return Question.objects.filter(user__id=self.request.user.id)
+
+    # Доступ к view только атворизованным пользователям
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+
+class MyAnswersListView(ListView):
+    '''Список ответов пользователя'''
+    model = Answer
+    context_object_name = 'answers_list'
+    template_name = 'answer/list.html'
+
+    class Meta:
+        ordering = ('-created',)
+
+    def get_queryset(self):
+        '''Взять только ответы пользователя'''
+        return Answer.objects.filter(user__id=self.request.user.id)
 
     # Доступ к view только атворизованным пользователям
     @method_decorator(login_required)

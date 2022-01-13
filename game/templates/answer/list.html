@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Мои вопросы{% endblock %}
+
+{% block content %}
+<main>
+    <div class="container">
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="d-flex align-items-center mb-4">
+                    <h1 class="my-0">Мои ответы</h1>
+                    <p class="ms-4 mb-0 pt-3">Всего ответов: <span class="count">{{ answers_list.count }}</span></p>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="my-answers">
+                    {% for a in answers_list %}
+                        <a href='#' class="my-answer">
+                            <img src="{{ a.image.url }}" alt="" class="my-answer__img">
+                            <p class="my-answer__text">
+                                {% if a.text %}
+                                    {{ a.text }}
+                                {% else %}
+                                    <span class="empty">[описание отсутствует]</span>
+                                {% endif %}
+                            </p>
+                        </a>
+                    {% empty %}
+                        <p class="my-answers-empty">Вы еще не создали ответ</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block js_scripts_after %}
+
+<script>
+    $(document).ready(function() {
+
+    })
+</script>
+
+{% endblock %}
