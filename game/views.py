@@ -10,7 +10,7 @@ from django.views.decorators.http import require_POST
 from django.http import HttpResponseForbidden
 
 from account.services.utils.ajax import is_ajax
-from .services.questions import create_question
+from .services.questions import create_question, delete_users_question
 from .models import Question
 from .forms import CreateQuestionForm
 
@@ -80,3 +80,23 @@ def ajax_create_question(request):
             )
     else:
         return HttpResponseForbidden()
+
+
+
+@require_POST
+@login_required
+def ajax_delete_question(request, question_id):
+    '''Обработка AJAX-запроса на удаление вопроса'''
+
+    if not is_ajax(request):
+        return HttpResponseForbidden()
+
+    try:
+        num = delete_users_question(question_id, request.user)
+    except Exception as err:
+        return JsonResponse({
+            'success': False,
+            'errors': err
+        })
+
+    return JsonResponse({'success': True, 'deleted_num': num})

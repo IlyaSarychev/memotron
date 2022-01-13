@@ -18,3 +18,11 @@ def create_question(text, is_published, user):
         raise err
 
     return question
+
+
+def delete_users_question(id, user):
+    '''Удалить вопрос пользователя. 
+    Пользователя нужно передать, чтобы проверить, его ли это вопрос.
+    Возвращает количество удаленных записей'''
+
+    return Question.objects.get(id=id, user=user).delete()[0]

@@ -1,9 +1,9 @@
-$(document).ready(function() {
+$(document).ready(function () {
 
     const _validImageFileExtensions = ["jpg", "jpeg", "gif", "png"]
 
     // Обработка формы смены фото профиля
-    $('.profile-photo-form input[type="file"]').change(function(e) {
+    $('.profile-photo-form input[type="file"]').change(function (e) {
 
         const file = $(this).get(0).files[0]
         const filename = file.name
@@ -11,7 +11,7 @@ $(document).ready(function() {
         // if (file.size > 1024) {
         //     return alert('Максимальный размер загружаемого файла: 1k');
         // }
-        
+
         if (_validImageFileExtensions.includes(filename.split('.').pop())) {
             // Правильное расширение файла
 
@@ -42,4 +42,12 @@ $(document).ready(function() {
             alert('Файл должен иметь одно из разширений: "jpg", "jpeg", "gif", "png".')
         }
     })
+
+    window.getCookie = function(name) {
+        let matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
+    }
+
 })

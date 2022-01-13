@@ -16,6 +16,7 @@
                         <th>#</th>
                         <th>Вопрос</th>
                         <th>Опубликован</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -30,10 +31,18 @@
                                     <span>Нет</span>
                                 {% endif %}
                             </td>
+                            <td class="d-flex">
+                                <button 
+                                    class="btn delete-question btn-outline-danger ms-auto" 
+                                    data-id="{{q.id}}"
+                                >
+                                    Удалить
+                                </button>
+                            </td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="3">Ничего нет</td>
+                            <td colspan="4">Ничего нет</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -41,4 +50,31 @@
         </div>
     </div>
 </main>
+{% endblock %}
+
+{% block js_scripts_after %}
+
+<script>
+    $(document).ready(function() {
+
+        $('.delete-question').click(function() {
+            const q_id = $(this).attr('data-id')
+            
+            fetch('/ajax-delete-question/' + q_id, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        $(this).closest('tr').remove()
+                    }
+                })
+        })
+    })
+</script>
+
 {% endblock %}
