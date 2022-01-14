@@ -6,10 +6,10 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.http import HttpResponseForbidden
-from sorl.thumbnail import get_thumbnail
 
 from account.services.utils.ajax import is_ajax
 from .services.questions import create_question, delete_users_question
+from .services import answers
 from .models import Answer, Question
 from .forms import CreateQuestionForm, CreateAnswerForm
 
@@ -73,9 +73,7 @@ def ajax_create_question(request):
 
     if is_ajax(request):
         import json
-
         data = json.loads(request.body)
-
         try:
             q = create_question(data.get('text'), 
                                 data.get('is_published'), 
@@ -102,7 +100,6 @@ def ajax_create_question(request):
         return HttpResponseForbidden()
 
 
-
 @require_POST
 @login_required
 def ajax_delete_question(request, question_id):
@@ -110,7 +107,6 @@ def ajax_delete_question(request, question_id):
 
     if not is_ajax(request):
         return HttpResponseForbidden()
-
     try:
         num = delete_users_question(question_id, request.user)
     except Exception as err:
@@ -118,8 +114,8 @@ def ajax_delete_question(request, question_id):
             'success': False,
             'errors': err
         })
-
-    return JsonResponse({'success': True, 'deleted_num': num})
+    else:
+        return JsonResponse({'success': True, 'deleted_num': num})
 
 
 @require_POST
@@ -127,29 +123,43 @@ def ajax_delete_question(request, question_id):
 def ajax_create_answer(request):
     '''Обработка AJAX-запроса на добавление ответа пользователем'''
 
-    if is_ajax(request):
-        
-        form = CreateAnswerForm(request.POST, request.FILES)
-        if form.is_valid():
-            answer = form.save(commit=False)
-            answer.user = request.user
-            answer.save()
-            answer_thumbnail = get_thumbnail(answer.image.path, 
-                                             '150x150', 
-                                             crop='center')
-            return JsonResponse({
-                'success': True,
-                'answer': {
-                    'text': answer.text,
-                    'image_url': answer.image.url,
-                    'is_published': answer.is_published,
-                    'thumbnail_url': answer_thumbnail.url
-                }
-            })
-        else:
-            return JsonResponse({
-                'success': False,
-                'errors': form.errors
-            })
-    else:
+    if not is_ajax(request):
         return HttpResponseForbidden()
+
+    form = CreateAnswerForm(request.POST, request.FILES)
+    if form.is_valid():
+        answer = answers.create_answer_by_form(request, form)
+        answer_thumbnail = answers.get_answer_thumbnail(answer)
+        
+        return JsonResponse({
+            'success': True,
+            'answer': {
+                'text': answer.text,
+                'image_url': answer.image.url,
+                'is_published': answer.is_published,
+                'thumbnail_url': answer_thumbnail.url
+            }
+        })
+    else:
+        return JsonResponse({
+            'success': False,
+            'errors': form.errors
+        })
+        
+
+@require_POST
+@login_required
+def ajax_delete_answer(request, answer_id):
+    '''Обработка AJAX-запроса на удаление ответа'''
+
+    if not is_ajax(request):
+        return HttpResponseForbidden()
+    try:
+        num = answers.delete_users_answer(answer_id, request.user)
+    except Exception as err:
+        return JsonResponse({
+            'success': False,
+            'errors': err
+        })
+    else:
+        return JsonResponse({'success': True, 'deleted_num': num})

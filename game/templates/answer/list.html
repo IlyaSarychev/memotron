@@ -15,7 +15,13 @@
             <div class="col-12">
                 <div class="my-answers">
                     {% for a in answers_list %}
-                        <a href='#' class="my-answer">
+                        <a 
+                            href='#' 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#answerModal" 
+                            data-bs-answer-id="{{a.id}}"
+                            class="my-answer"
+                        >
                             <img src="{{ a.image.url }}" alt="" class="my-answer__img">
                             <p class="my-answer__text">
                                 {% if a.text %}
@@ -33,13 +39,54 @@
         </div>
     </div>
 </main>
+
+<div class="modal fade answer-modal" id="answerModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Что вы хотите сделать?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <!-- <div class="modal-body">
+          <p>Modal body text goes here.</p>
+        </div> -->
+        <div class="modal-footer">
+          <button type="button" class="delete-answer btn btn-danger">Удалить</button>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 
 {% block js_scripts_after %}
 
 <script>
     $(document).ready(function() {
+        const answerModal = document.getElementById('answerModal')
 
+        answerModal.addEventListener('show.bs.modal', function (event) {
+            const answerBlock = event.relatedTarget
+            const answerId = answerBlock.getAttribute('data-bs-answer-id')
+            answerModal.setAttribute('data-bs-answer-id', answerId)
+        })
+
+        $('#answerModal .delete-answer').click(function() {
+            const answerId = $(this).closest('.modal').attr('data-bs-answer-id')
+
+            fetch('/ajax-delete-answer/' + answerId, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    const modal = bootstrap.Modal.getInstance(answerModal)
+                    modal.hide()
+                    $(`.my-answer[data-bs-answer-id="${$(answerModal).attr('data-bs-answer-id')}"]`).remove()
+                })
+        })
     })
 </script>
 
