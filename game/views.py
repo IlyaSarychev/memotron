@@ -61,7 +61,7 @@ def create_question_or_answer_view(request):
 
     question_form = CreateQuestionForm()
     
-    return render(request, 'question/create.html',
+    return render(request, 'create.html',
                   {'question_form': question_form})
 
 
