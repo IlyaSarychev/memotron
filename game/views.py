@@ -1,5 +1,3 @@
-import json
-
 from django.core.exceptions import ValidationError
 from django.http.response import JsonResponse
 from django.shortcuts import render
@@ -8,6 +6,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.http import HttpResponseForbidden
+from sorl.thumbnail import get_thumbnail
 
 from account.services.utils.ajax import is_ajax
 from .services.questions import create_question, delete_users_question
@@ -129,22 +128,22 @@ def ajax_create_answer(request):
     '''Обработка AJAX-запроса на добавление ответа пользователем'''
 
     if is_ajax(request):
-
-        print(request.FILES)
         
         form = CreateAnswerForm(request.POST, request.FILES)
         if form.is_valid():
-            import json
-
             answer = form.save(commit=False)
             answer.user = request.user
             answer.save()
+            answer_thumbnail = get_thumbnail(answer.image.path, 
+                                             '150x150', 
+                                             crop='center')
             return JsonResponse({
                 'success': True,
                 'answer': {
                     'text': answer.text,
                     'image_url': answer.image.url,
-                    'is_published': answer.is_published
+                    'is_published': answer.is_published,
+                    'thumbnail_url': answer_thumbnail.url
                 }
             })
         else:

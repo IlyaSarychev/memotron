@@ -83,3 +83,9 @@
 .my-answer__text .empty {
     opacity: .7;
 }
+
+.created-answers {
+    width: 100%;
+    display: flex;
+    gap: 10px;
+}

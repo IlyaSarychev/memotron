@@ -11,46 +11,51 @@
                 <form id="questionForm" action="{% url 'game:ajax_create_question' %}" method="post">
                     {% csrf_token %}
                     {% for field in question_form.visible_fields %}
-                        {% if field.is_checkbox %}
-                            <div class="form-check mb-3">
-                                {{field}}
-                                <label class="form-check-label" for="{{field.auto_id}}">
-                                    {{field.label}}
-                                </label>
-                            </div>
-                        {% else %}
-                            <div class="mb-3">
-                                <label for="{{ field.auto_id }}" class="form-label">{{field.label}}</label>
-                                {{field}}
-                                <div class="invalid-feedback"></div>
-                            </div>
-                        {% endif %}
+                    {% if field.is_checkbox %}
+                    <div class="form-check mb-3">
+                        {{field}}
+                        <label class="form-check-label" for="{{field.auto_id}}">
+                            {{field.label}}
+                        </label>
+                    </div>
+                    {% else %}
+                    <div class="mb-3">
+                        <label for="{{ field.auto_id }}" class="form-label">{{field.label}}</label>
+                        {{field}}
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    {% endif %}
                     {% endfor %}
                     <button type="submit" class="btn btn-dark">Создать</button>
                 </form>
+                <ul class="list-group mt-4">
+                </ul>
             </div>
             <div class="col-md-6">
                 <h2 class="mb-4">Создать ответ</h2>
-                <form id="answerForm" action="{% url 'game:ajax_create_answer' %}" method="post" enctype="multipart/form-data">
+                <form id="answerForm" action="{% url 'game:ajax_create_answer' %}" method="post"
+                    enctype="multipart/form-data">
                     {% csrf_token %}
                     {% for field in answer_form.visible_fields %}
-                        {% if field.is_checkbox %}
-                            <div class="form-check mb-3">
-                                {{field}}
-                                <label class="form-check-label" for="{{field.auto_id}}">
-                                    {{field.label}}
-                                </label>
-                            </div>
-                        {% else %}
-                            <div class="mb-3">
-                                <label for="{{ field.auto_id }}" class="form-label">{{field.label}}</label>
-                                {{field}}
-                                <div class="invalid-feedback"></div>
-                            </div>
-                        {% endif %}
+                    {% if field.is_checkbox %}
+                    <div class="form-check mb-3">
+                        {{field}}
+                        <label class="form-check-label" for="{{field.auto_id}}">
+                            {{field.label}}
+                        </label>
+                    </div>
+                    {% else %}
+                    <div class="mb-3">
+                        <label for="{{ field.auto_id }}" class="form-label">{{field.label}}</label>
+                        {{field}}
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    {% endif %}
                     {% endfor %}
                     <button type="submit" class="btn btn-dark">Создать</button>
                 </form>
+                <div class="created-answers mt-4">
+                </div>
             </div>
         </div>
     </div>
@@ -59,7 +64,7 @@
 
 {% block js_scripts_after %}
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
 
         // создать объект data из формы для отправки через fetch
         function createFormDataObject(form) {
@@ -74,16 +79,16 @@
         // Записать в объект data состояния true/false чекбоксов
         function setCheckboxesInData(data, form) {
             const checkbox = $(form).find('input[type=checkbox]')
-            checkbox.each(function(i, el) {
+            checkbox.each(function (i, el) {
                 data[$(el).attr('name')] = $(this).is(':checked')
             })
             return data
         }
-        
+
         const questionForm = $('#questionForm')
         const answerForm = $('#answerForm')
 
-        questionForm.submit(function(e) {
+        questionForm.submit(function (e) {
             e.preventDefault()
 
             let data = createFormDataObject(this)
@@ -101,12 +106,12 @@
                 .then(response => response.json())
                 .then(data => {
 
-                    $(this).find('input, textarea').each(function(i, el) {
+                    $(this).find('input, textarea').each(function (i, el) {
                         $(el).removeClass('is-invalid')
                     })
-                    
+
                     if (data.hasOwnProperty('error')) {
-                        Object.keys(data.error).forEach(function(key) {
+                        Object.keys(data.error).forEach(function (key) {
                             const field = questionForm.find(`[name="${key}"]`)
                             field.addClass('is-invalid')
                             field.next('.invalid-feedback').text(data.error[key][0])
@@ -115,11 +120,15 @@
 
                     if (data.success) {
                         $(this).get(0).reset()
+
+                        $(this).next('.list-group').append(
+                            `<li class="list-group-item" data-q-id="${data.question.id}">${data.question.text}</li>`
+                        )
                     }
                 })
         })
 
-        answerForm.submit(function(e) {
+        answerForm.submit(function (e) {
             e.preventDefault()
 
             let formdata = new FormData()
@@ -127,7 +136,7 @@
             formdata.append('text', $(this).find('[name="text"]').val())
             formdata.append('image', $(this).find('[name="image"]')[0].files[0])
             formdata.append('is_published', $(this).find('[name="is_published"]').is(':checked'))
-            
+
             fetch($(this).attr('action'), {
                 method: 'POST',
                 headers: {
@@ -138,8 +147,31 @@
             })
                 .then(req => req.json())
                 .then(data => {
-                    // доделать
-                    return
+
+                    $(this).find('input, textarea').each(function (i, el) {
+                        $(el).removeClass('is-invalid')
+                    })
+
+                    if (data.hasOwnProperty('error')) {
+                        Object.keys(data.errors).forEach(function (key) {
+                            const field = questionForm.find(`[name="${key}"]`)
+                            field.addClass('is-invalid')
+                            field.next('.invalid-feedback').text(data.error[key][0])
+                        })
+                    }
+
+                    if (data.success) {
+                        $(this).get(0).reset()
+
+                        $(this).next('.created-answers').append(
+                            `<div class="created-answer" 
+                                data-q-id="${data.answer.id}"
+                            >
+                                <img class="img-thumbnail" src="${data.answer.thumbnail_url}" />
+                            </div>`
+                        )
+                    }
+
                 })
         })
 
