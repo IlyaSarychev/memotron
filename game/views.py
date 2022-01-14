@@ -12,7 +12,7 @@ from django.http import HttpResponseForbidden
 from account.services.utils.ajax import is_ajax
 from .services.questions import create_question, delete_users_question
 from .models import Answer, Question
-from .forms import CreateQuestionForm
+from .forms import CreateQuestionForm, CreateAnswerForm
 
 
 class MyQuestionListView(ListView):
@@ -60,9 +60,11 @@ def create_question_or_answer_view(request):
     # CreateView вместе с несколькими моделями
 
     question_form = CreateQuestionForm()
+    answer_form = CreateAnswerForm()
     
     return render(request, 'create.html',
-                  {'question_form': question_form})
+                  {'question_form': question_form,
+                   'answer_form': answer_form})
 
 
 @require_POST
@@ -119,3 +121,36 @@ def ajax_delete_question(request, question_id):
         })
 
     return JsonResponse({'success': True, 'deleted_num': num})
+
+
+@require_POST
+@login_required
+def ajax_create_answer(request):
+    '''Обработка AJAX-запроса на добавление ответа пользователем'''
+
+    if is_ajax(request):
+
+        print(request.FILES)
+        
+        form = CreateAnswerForm(request.POST, request.FILES)
+        if form.is_valid():
+            import json
+
+            answer = form.save(commit=False)
+            answer.user = request.user
+            answer.save()
+            return JsonResponse({
+                'success': True,
+                'answer': {
+                    'text': answer.text,
+                    'image_url': answer.image.url,
+                    'is_published': answer.is_published
+                }
+            })
+        else:
+            return JsonResponse({
+                'success': False,
+                'errors': form.errors
+            })
+    else:
+        return HttpResponseForbidden()

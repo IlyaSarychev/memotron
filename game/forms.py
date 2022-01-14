@@ -14,3 +14,19 @@ class CreateQuestionForm(forms.ModelForm):
         super().__init__(*args, *kwargs)
         # изменение полей формы и их виджетов (например, добавление классов bootstrap)
         process_form_fields(self, checked=True)
+
+
+class CreateAnswerForm(forms.ModelForm):
+    '''Форма создания ответа пользователем'''
+
+    class Meta:
+        model = Answer
+        fields = ['image', 'text', 'is_published']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, *kwargs)
+        # изменение полей формы и их виджетов (например, добавление классов bootstrap)
+        process_form_fields(self, checked=True, textarea_rows=1)
+
+        
+    
