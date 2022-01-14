@@ -22,18 +22,29 @@
                 <tbody>
                     {% for q in questions_list %}
                         <tr>
-                            <th><span>{{ forloop.counter }}</span></th>
-                            <td><span>{{ q.text }}</span></td>
+                            <th><span class="question-num">{{ forloop.counter }}</span></th>
+                            <td><span class="question-text">{{ q.text }}</span></td>
                             <td>
                                 {% if q.is_published %}
-                                    <span>Да</span>
+                                    <span class="question-is-published">Да</span>
                                 {% else %}
-                                    <span>Нет</span>
+                                    <span class="question-is-published">Нет</span>
                                 {% endif %}
                             </td>
                             <td class="d-flex">
+                                <button class="update-question btn btn-outline-primary ms-auto"
+                                    data-id="{{q.id}}"
+                                >
+                                    Редактировать
+                                </button>
+                                <button style="display: none;" 
+                                    class="save-changes btn btn-outline-success ms-auto"
+                                    data-id="{{q.id}}"
+                                >
+                                    Сохранить
+                                </button>
                                 <button 
-                                    class="btn delete-question btn-outline-danger ms-auto" 
+                                    class="btn delete-question btn-outline-danger ms-2" 
                                     data-id="{{q.id}}"
                                 >
                                     Удалить
@@ -74,6 +85,47 @@
                         $('.count').text(Number($('.count').text() - 1))
                     }
                 })
+        })
+
+
+        $('.update-question').click(function() {
+
+            $(this).parent().find('button').hide()
+            $(this).parent().find('.save-changes').show()
+
+            const row = $(this).closest('tr')
+            const num = row.find('.question-num').text()
+            const text = row.find('.question-text')
+            text.replaceWith(`
+                <input class="form-control question-text-field" name="text" value="${text.text()}">
+            `)
+            const published = row.find('.question-is-published')
+            published.replaceWith(`
+                <div class="form-check question-is-published-field">
+                    <input class="form-check-input" name='is_published' id="question_${num}" type="checkbox" 
+                        ${published.text() == 'Да' ? 'checked' : ''}>
+                    <label class="form-check-label" for="question_${num}">
+                        Опубликован?
+                    </label>
+                </div>
+            `)
+
+        })
+
+        $('.save-changes').click(function() {
+
+            $(this).parent().find('button').show()
+            $(this).hide()
+
+            const row = $(this).closest('tr')
+            const textField = row.find('.question-text-field')
+            textField.replaceWith(`
+                <span class="question-text">${textField.val()}</span>
+            `)
+            const publishedField = row.find('.question-is-published-field')
+            publishedField.replaceWith(`
+                <span class="question-is-published">${publishedField.is(':checked') ? 'Да' : 'Нет'}</span>
+            `)
         })
     })
 </script>
