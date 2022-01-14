@@ -32,6 +32,11 @@ class Answer(models.Model):
     text = models.TextField('Текст ответа', blank=True, null=True)
     is_published = models.BooleanField('Ответ опубликован?', 
                                         default=False)
+    created = models.DateTimeField('Дата создания', 
+                                    auto_now_add=True)
+    updated = models.DateTimeField('Дата обновления',
+                                    auto_now=True,
+                                    null=True)
 
     def __str__(self):
         return f'Ответ "{self.id}"'
