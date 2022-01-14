@@ -124,7 +124,7 @@
             `)
             const publishedField = row.find('.question-is-published-field')
             publishedField.replaceWith(`
-                <span class="question-is-published">${publishedField.is(':checked') ? 'Да' : 'Нет'}</span>
+                <span class="question-is-published">${publishedField.find('input').is(':checked') ? 'Да' : 'Нет'}</span>
             `)
         })
     })
