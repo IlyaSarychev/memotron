@@ -21,7 +21,7 @@
                 </thead>
                 <tbody>
                     {% for q in questions_list %}
-                        <tr>
+                        <tr data-question-id="{{q.id}}">
                             <th><span class="question-num">{{ forloop.counter }}</span></th>
                             <td><span class="question-text">{{ q.text }}</span></td>
                             <td>
@@ -99,6 +99,8 @@
             text.replaceWith(`
                 <input class="form-control question-text-field" name="text" value="${text.text()}">
             `)
+            const textField = row.find('[name="text"]')
+
             const published = row.find('.question-is-published')
             published.replaceWith(`
                 <div class="form-check question-is-published-field">
@@ -109,15 +111,63 @@
                     </label>
                 </div>
             `)
+            const publishedField = row.find("[name='is_published']")
+            
+            const textInitial = textField.val()
+            const publishedInitial = publishedField.is(':checked')
 
+            textField.on('input', function() {
+                if ($(this).val() !== textInitial) {
+                    $(this).addClass('changed')
+                } else {
+                    $(this).removeClass('changed')
+                }
+            })
+
+            publishedField.on('change', function() {
+                if ($(this).is(':checked') !== publishedInitial) {
+                    $(this).addClass('changed')
+                } else {
+                    $(this).removeClass('changed')
+                }
+            })
         })
 
         $('.save-changes').click(function() {
 
-            $(this).parent().find('button').show()
-            $(this).hide()
-
+            const questionId = $(this).attr('data-id')
             const row = $(this).closest('tr')
+
+            const changedFields = row.find('.changed')
+
+            if (changedFields.length) {
+
+                let data = {}
+
+                changedFields.each(function(idx, field) {
+                    if ($(field).attr('type') == 'checkbox') {
+                        data[$(field).attr('name')] = $(field).is(':checked')
+                    } else {
+                        data[$(field).attr('name')] = $(field).val()
+                    }
+                })
+
+                // отправить измененные данные
+                fetch('/ajax-update-question/' + questionId, {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        // обработка ответа от сервера
+                    })
+            }
+
             const textField = row.find('.question-text-field')
             textField.replaceWith(`
                 <span class="question-text">${textField.val()}</span>
@@ -126,6 +176,9 @@
             publishedField.replaceWith(`
                 <span class="question-is-published">${publishedField.find('input').is(':checked') ? 'Да' : 'Нет'}</span>
             `)
+
+            $(this).parent().find('button').show()
+            $(this).hide()
         })
     })
 </script>

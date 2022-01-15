@@ -26,3 +26,9 @@ def delete_users_question(id, user):
     Возвращает количество удаленных записей'''
 
     return Question.objects.get(id=id, user=user).delete()[0]
+
+
+def update_question(id, **updates):
+    '''Изменить вопрос'''
+
+    Question.objects.filter(id=id).update(**updates)

@@ -8,7 +8,7 @@ from django.views.decorators.http import require_POST
 from django.http import HttpResponseForbidden
 
 from account.services.utils.ajax import is_ajax
-from .services.questions import create_question, delete_users_question
+from .services import questions
 from .services import answers
 from .models import Answer, Question
 from .forms import CreateQuestionForm, CreateAnswerForm
@@ -75,7 +75,7 @@ def ajax_create_question(request):
         import json
         data = json.loads(request.body)
         try:
-            q = create_question(data.get('text'), 
+            q = questions.create_question(data.get('text'), 
                                 data.get('is_published'), 
                                 request.user)
             return JsonResponse(
@@ -108,7 +108,7 @@ def ajax_delete_question(request, question_id):
     if not is_ajax(request):
         return HttpResponseForbidden()
     try:
-        num = delete_users_question(question_id, request.user)
+        num = questions.delete_users_question(question_id, request.user)
     except Exception as err:
         return JsonResponse({
             'success': False,
@@ -116,6 +116,28 @@ def ajax_delete_question(request, question_id):
         })
     else:
         return JsonResponse({'success': True, 'deleted_num': num})
+
+
+@require_POST
+@login_required
+def ajax_update_question(request, question_id):
+    '''Обработка AJAX-запроса на изменение вопроса'''
+
+    if not is_ajax(request):
+        return HttpResponseForbidden()
+
+    try:
+        import json
+
+        data = json.loads(request.body)
+        questions.update_question(id=question_id, **data)
+    except Exception as err:
+        return JsonResponse({
+            'success': False,
+            'errors': err
+        })
+    else:
+        return JsonResponse({'success': True})
 
 
 @require_POST

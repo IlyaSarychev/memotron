@@ -11,6 +11,7 @@ urlpatterns = [
                                        name='create_question_or_answer'),
     path('ajax-create-question/', views.ajax_create_question, name='ajax_create_question'),
     path('ajax-delete-question/<int:question_id>', views.ajax_delete_question, name='ajax_delete_question'),
+    path('ajax-update-question/<int:question_id>', views.ajax_update_question, name='ajax_update_question'),
     path('ajax-create-answer/', views.ajax_create_answer, name='ajax_create_answer'),
     path('ajax-delete-answer/<int:answer_id>', views.ajax_delete_answer, name='ajax_delete_answer'),
 ]
