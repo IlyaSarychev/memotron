@@ -40,3 +40,23 @@ class Answer(models.Model):
 
     def __str__(self):
         return f'Ответ "{self.id}"'
+
+
+class Deck(models.Model):
+    '''Колода, включающая в себя карты с вопросами и карты с ответами.'''
+
+    user = models.ForeignKey('auth.user', on_delete=models.CASCADE,
+                            related_name='decks')
+    title = models.CharField('Название колоды', max_length=250)
+    text = models.TextField('Описание колоды', blank=True,
+                            null=True)
+    image = models.ImageField('Изображение', upload_to='deck/%Y/%m/%d',
+                              blank=True,
+                              null=True)
+    questions = models.ManyToManyField(Question, related_name='decks')
+    answers = models.ManyToManyField(Answer, related_name='decks')
+    created = models.DateTimeField('Дата создания', 
+                                    auto_now_add=True)
+    updated = models.DateTimeField('Дата обновления',
+                                    auto_now=True,
+                                    null=True)
