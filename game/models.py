@@ -59,8 +59,10 @@ class Deck(models.Model):
     image = models.ImageField('Изображение', upload_to='deck/%Y/%m/%d',
                               blank=True,
                               null=True)
-    questions = models.ManyToManyField(Question, related_name='decks')
-    answers = models.ManyToManyField(Answer, related_name='decks')
+    questions = models.ManyToManyField(Question, related_name='decks',
+                                        verbose_name='Вопросы')
+    answers = models.ManyToManyField(Answer, related_name='decks',
+                                        verbose_name='Ответы')
     is_published = models.BooleanField('Ответ опубликован?', 
                                         default=False)
     created = models.DateTimeField('Дата создания', 

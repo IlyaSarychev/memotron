@@ -1,4 +1,6 @@
 from django import forms
+
+from game.services import questions
 from .models import Deck, Question, Answer
 from account.services.utils.forms import process_form_fields
 
@@ -34,12 +36,12 @@ class CreateDeckForm(forms.ModelForm):
 
     class Meta:
         model = Deck
-        fields = ['title', 'text', 'image', 'questions', 'answers']
+        fields = ['title', 'text', 'image', 'is_published']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, *kwargs)
         # изменение полей формы и их виджетов (например, добавление классов bootstrap)
-        process_form_fields(self, textarea_rows=3)
+        process_form_fields(self, checked=True, textarea_rows=1)
 
         
     

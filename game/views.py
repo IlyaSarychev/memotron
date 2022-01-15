@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.http.response import JsonResponse
 from django.shortcuts import render
-from django.views.generic import ListView
+from django.views.generic import ListView, CreateView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
@@ -10,8 +10,8 @@ from django.http import HttpResponseForbidden
 from account.services.utils.ajax import is_ajax
 from .services import questions
 from .services import answers
-from .models import Answer, Question
-from .forms import CreateQuestionForm, CreateAnswerForm
+from .models import Answer, Deck, Question
+from .forms import CreateQuestionForm, CreateAnswerForm, CreateDeckForm
 
 
 class MyQuestionListView(ListView):
@@ -19,9 +19,6 @@ class MyQuestionListView(ListView):
     model = Question
     context_object_name = 'questions_list'
     template_name = 'question/list.html'
-
-    class Meta:
-        ordering = ('-created',)
 
     def get_queryset(self):
         '''Взять только вопросы пользователя'''
@@ -38,9 +35,6 @@ class MyAnswersListView(ListView):
     model = Answer
     context_object_name = 'answers_list'
     template_name = 'answer/list.html'
-
-    class Meta:
-        ordering = ('-created',)
 
     def get_queryset(self):
         '''Взять только ответы пользователя'''
@@ -185,3 +179,33 @@ def ajax_delete_answer(request, answer_id):
         })
     else:
         return JsonResponse({'success': True, 'deleted_num': num})
+
+
+# Колоды
+class DeckListView(ListView):
+    '''Страница всех колод пользователя'''
+
+    model = Deck
+    context_object_name = 'deck_list'
+    template_name = 'deck/list.html'
+
+    def get_queryset(self):
+        '''Взять только вопросы пользователя'''
+        return Deck.objects.filter(user__id=self.request.user.id)
+
+    # Доступ к view только атворизованным пользователям
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+
+@login_required
+def create_deck_view(request):
+    '''Страница создания колоды'''
+
+    if request.method == 'POST':
+        pass
+    else:
+        form = CreateDeckForm()
+    return render(request, 'deck/create.html', 
+                  {'form': form})
