@@ -18,6 +18,9 @@ class Question(models.Model):
     is_published = models.BooleanField('Вопрос опубликован?', 
                                         default=False)
 
+    class Meta:
+        ordering = ('-created',)
+
     def __str__(self):
         return f'Вопрос: "{self.text[:20]}"'
 
@@ -37,6 +40,9 @@ class Answer(models.Model):
     updated = models.DateTimeField('Дата обновления',
                                     auto_now=True,
                                     null=True)
+
+    class Meta:
+        ordering = ('-created',)
 
     def __str__(self):
         return f'Ответ "{self.id}"'
@@ -60,3 +66,9 @@ class Deck(models.Model):
     updated = models.DateTimeField('Дата обновления',
                                     auto_now=True,
                                     null=True)
+
+    class Meta:
+        ordering = ('-created',)
+
+    def __str__(self):
+        return self.title
