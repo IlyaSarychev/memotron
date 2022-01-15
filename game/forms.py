@@ -1,5 +1,5 @@
 from django import forms
-from .models import Question, Answer
+from .models import Deck, Question, Answer
 from account.services.utils.forms import process_form_fields
 
 
@@ -27,6 +27,19 @@ class CreateAnswerForm(forms.ModelForm):
         super().__init__(*args, *kwargs)
         # изменение полей формы и их виджетов (например, добавление классов bootstrap)
         process_form_fields(self, checked=True, textarea_rows=1)
+
+
+class CreateDeckForm(forms.ModelForm):
+    '''Форма создания колоды'''
+
+    class Meta:
+        model = Deck
+        fields = ['title', 'text', 'image', 'questions', 'answers']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, *kwargs)
+        # изменение полей формы и их виджетов (например, добавление классов bootstrap)
+        process_form_fields(self, textarea_rows=3)
 
         
     

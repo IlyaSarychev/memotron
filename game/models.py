@@ -61,6 +61,8 @@ class Deck(models.Model):
                               null=True)
     questions = models.ManyToManyField(Question, related_name='decks')
     answers = models.ManyToManyField(Answer, related_name='decks')
+    is_published = models.BooleanField('Ответ опубликован?', 
+                                        default=False)
     created = models.DateTimeField('Дата создания', 
                                     auto_now_add=True)
     updated = models.DateTimeField('Дата обновления',
