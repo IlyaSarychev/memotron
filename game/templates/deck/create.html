@@ -12,24 +12,60 @@
                     {% csrf_token %}
                     <div class="row">
                         {% for field in form.visible_fields %}
-                            {% if field.is_checkbox %}
-                            <div class="col-12">
-                                <div class="form-check mb-3">
-                                    {{field}}
-                                    <label class="form-check-label" for="{{field.auto_id}}">
-                                        {{field.label}}
-                                    </label>
+                        {% if field.is_checkbox %}
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Выберите вопросы и ответы для колоды:</label>
+                                <div class="d-flex">
+                                    <div class="button-wrapper">
+                                        <button 
+                                            class="btn btn-primary questions-button position-relative" 
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#questionsModal"
+                                            type="button"
+                                        >
+                                            <span>Вопросы</span>
+                                            <span class="badge d-none bg-danger position-absolute top-0 start-100 translate-middle rounded-pill"></span>
+                                        </button>
+                                    </div>
+                                    <div class="button-wrapper">
+                                        <button 
+                                            class="btn btn-primary ms-3 answers-button position-relative"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#answersModal"
+                                            type="button"
+                                        >
+                                            <span>Ответы</span>
+                                            <span class="badge d-none bg-danger position-absolute top-0 start-100 translate-middle rounded-pill"></span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                            {% else %}
-                            <div class="col-md-6">
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check mb-3">
+                                {{field}}
+                                <label class="form-check-label" for="{{field.auto_id}}">
+                                    {{field.label}}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="chosen d-none">
+                                <label class="form-label">Выбранные вопросы и ответы:</label>
+                                <div class="chosen-questions"></div>
+                                <div class="chosen-answers"></div>
+                            </div>
+                        </div>
+                        {% else %}
+                            <div class="col-md-6 {% if field.is_hidden %}d-none{% endif %}">
                                 <div class="mb-3">
                                     <label for="{{ field.auto_id }}" class="form-label">{{field.label}}</label>
                                     {{field}}
                                     <div class="invalid-feedback"></div>
                                 </div>
                             </div>
-                            {% endif %}
+                        {% endif %}
                         {% endfor %}
                     </div>
                     <button class="btn btn-dark" type="submit">Создать</button>
@@ -38,4 +74,125 @@
         </div>
     </div>
 </main>
+
+<div class="modal" id="questionsModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Выберите вопросы</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-q-list">
+                    {% for q in questions %}
+                        <div class="form-check">
+                            <input class="form-check-input" name="question" type="checkbox" value="{{ q.id }}" id="question{{q.id}}">
+                            <label class="form-check-label" for="question{{q.id}}">
+                                {{q.text}}
+                            </label>
+                        </div>
+                    {% empty %}
+                        <p>
+                            Вы еще не создавали свои вопросы. 
+                            <a href="{% url 'game:create_question_or_answer' %}">Создать</a>
+                        </p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="answersModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Выберите ответы</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-a-list">
+                    {% for a in answers %}
+                        <div class="modal-a">
+                            <input type="checkbox" name="answer" class="d-none modal-a__input" value="{{ a.id }}" id="answer{{ a.id }}">
+                            <label class="m-0 d-block modal-a__label" for="answer{{ a.id }}">
+                                <img src="{{ a.image.url }}" alt="" class="modal-a__img">
+                                <p class="modal-a__text">
+                                    {% if a.text %}
+                                        {{a.text}}
+                                    {% else %}
+                                        <span class="secondary">[Описание отсутствует]</span>
+                                    {% endif %}
+                                </p>
+                            </label>
+                        </div>
+                    {% empty %}
+                    <p>
+                        Вы еще не создавали свои ответы. 
+                        <a href="{% url 'game:create_question_or_answer' %}">Создать</a>
+                    </p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js_scripts_after %}
+
+<script>
+    $(document).ready(function() {
+
+        const questions = new Set()
+        const answers = new Set()
+
+        $('.modal-q-list input[name="question"]').change(function() {
+            const qId = Number($(this).val())
+            if ($(this).is(':checked')) {
+                questions.add(qId)
+            } else {
+                questions.delete(qId)
+            }
+
+            const badge = $('.questions-button').find('.badge')
+
+            if (!questions.size) {
+                badge.addClass('d-none')
+            } else {
+                badge.text(questions.size)
+                badge.removeClass('d-none')
+            }
+        })
+
+        $('.modal-a-list input[name="answer"]').change(function() {
+
+            const aId = Number($(this).val())
+
+            if ($(this).is(':checked')) {
+                answers.add(aId)
+            } else {
+                answers.delete(aId)
+            }
+
+            const badge = $('.answers-button').find('.badge')
+
+            if (!answers.size) {
+                badge.addClass('d-none')
+            } else {
+                badge.text(answers.size)
+                badge.removeClass('d-none')
+            }
+
+            console.log(answers)
+        })
+    })
+</script>
+
 {% endblock %}

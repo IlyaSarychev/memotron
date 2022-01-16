@@ -206,6 +206,13 @@ def create_deck_view(request):
     if request.method == 'POST':
         pass
     else:
+        user = request.user
         form = CreateDeckForm()
+        questions = user.questions.all()
+        answers = user.answers.all()
     return render(request, 'deck/create.html', 
-                  {'form': form})
+                    {
+                        'form': form,
+                        'questions': questions,
+                        'answers': answers
+                    })
