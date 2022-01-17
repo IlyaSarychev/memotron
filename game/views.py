@@ -242,3 +242,24 @@ def ajax_create_deck(request):
             'deck': None,
             'errors': dict(form.errors)
         })
+
+
+@login_required
+@require_POST
+def ajax_delete_deck(request, deck_id):
+    '''Обработка AJAX-запроса на удаление колоды'''
+
+    if not is_ajax(request):
+        return HttpResponseForbidden()
+
+    try:
+        deleted = deck_service.delete_deck(deck_id, request.user)
+        return JsonResponse({
+            'success': True,
+            'deleted_num': deleted
+        })
+    except Exception as err:
+        print(err)
+        return JsonResponse({
+            'success': False
+        })

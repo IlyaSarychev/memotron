@@ -181,3 +181,14 @@
 .modal-a:hover .modal-a__text {
     transform: translateY(0);
 }
+
+.table td, th {
+    vertical-align: middle;
+}
+
+.deck-buttons-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 20px;
+}

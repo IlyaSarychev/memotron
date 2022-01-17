@@ -1,6 +1,7 @@
 '''Сервисы для работы с колодами'''
 
 from ..forms import CreateDeckForm
+from ..models import Deck
 
 
 def create_deck_from_request_with_form(request):
@@ -25,3 +26,10 @@ def create_deck_from_request_with_form(request):
         return True, form, deck
     else:
         return False, form, None
+
+
+def delete_deck(deck_id, user):
+    '''Удалить колоду по id. Необходимо передать user, 
+    чтобы пользователь удалял только свои колоды'''
+    
+    return Deck.objects.filter(id=deck_id, user__id=user.id).delete()[0]

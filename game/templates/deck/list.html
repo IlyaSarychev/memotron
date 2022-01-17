@@ -21,13 +21,23 @@
                     </thead>
                     <tbody>
                         {% for d in deck_list %}
-                            <tr>
+                            <tr data-id="{{ d.id }}">
                                 <th>{{ forloop.counter }}</th>
                                 <td><span>{{ d.title }}</span></td>
                                 <td><span>{{ d.questions.count }}</span></td>
                                 <td><span>{{ d.answers.count }}</span></td>
                                 <td><span>{{ d.questions.count|add:d.answers.count }}</span></td>
-                                <td></td>
+                                <td>
+                                    <div class="deck-buttons-wrapper">
+                                        <button 
+                                            class="delete-deck btn btn-outline-danger"
+                                            type="button"
+                                            data-id="{{ d.id }}"
+                                        >
+                                            Удалить
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
                         {% empty %}
                             <tr>
@@ -45,4 +55,25 @@
 {% endblock %}
 
 {% block js_scripts_after %}
+<script>
+    $(document).ready(function() {
+        $('.delete-deck').click(function() {
+            const deckId = Number($(this).attr('data-id'))
+
+            fetch('/ajax-delete-deck/' + deckId, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        $(`tr[data-id="${deckId}"]`).remove()
+                    }
+                })
+        })
+    })
+</script>
 {% endblock %}
