@@ -17,5 +17,6 @@ urlpatterns = [
 
     # колода
     path('create-deck/', views.create_deck_view, name='create_deck'),
+    path('my-decks/', views.DeckListView.as_view(), name='my_decks'),
     path('ajax-create-deck/', views.ajax_create_deck, name='ajax_create_deck')
 ]

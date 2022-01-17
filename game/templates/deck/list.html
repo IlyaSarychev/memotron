@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Мои колоды{% endblock %}
+
+{% block content %}
+<main>
+    <div class="container">
+        <div class="row mt-5">
+            <div class="col-12">
+                <h1 class="mb-4">Мои колоды</h1>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Название</th>
+                            <th>Вопросы</th>
+                            <th>Ответы</th>
+                            <th>Всего карточек</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in deck_list %}
+                            <tr>
+                                <th>{{ forloop.counter }}</th>
+                                <td><span>{{ d.title }}</span></td>
+                                <td><span>{{ d.questions.count }}</span></td>
+                                <td><span>{{ d.answers.count }}</span></td>
+                                <td><span>{{ d.questions.count|add:d.answers.count }}</span></td>
+                                <td></td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <th colspan="6">
+                                    <p>У вас пока нет колод. Вы можете её <a href="{% url 'game:create_deck' %}">создать</a>.</p>
+                                </th>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block js_scripts_after %}
+{% endblock %}
