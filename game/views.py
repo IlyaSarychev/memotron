@@ -1,16 +1,14 @@
-import re
 from django.core.exceptions import ValidationError
 from django.http.response import JsonResponse
 from django.shortcuts import render
-from django.views.generic import ListView, CreateView
+from django.views.generic import ListView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.http import HttpResponseForbidden
 
 from account.services.utils.ajax import is_ajax
-from .services import questions
-from .services import answers
+from .services import questions, answers, deck_service
 from .models import Answer, Deck, Question
 from .forms import CreateQuestionForm, CreateAnswerForm, CreateDeckForm
 
@@ -224,18 +222,9 @@ def ajax_create_deck(request):
     if not is_ajax(request):
         return HttpResponseForbidden()
 
-    form = CreateDeckForm(request.POST, request.FILES)
-    if form.is_valid():
-        deck = form.save(commit=False)
-        deck.user = request.user
-        # нужно сохранить объект в базе данных прежде, чем добавлять many-to-many значения
-        # это нужно, чтобы у объекта в бд появился id
-        deck.save()
-        if len(request.POST.get('questions')) > 0:
-            deck.questions.add(*[int(i) for i in request.POST.get('questions').split(',')])
-        if len(request.POST.get('answers')) > 0:
-            deck.answers.add(*[int(i) for i in request.POST.get('answers').split(',')])
-        deck.save()
+    success, form, deck = deck_service.create_deck_from_request_with_form(request)
+
+    if success:
         return JsonResponse({
             'success': True,
             'deck': {
