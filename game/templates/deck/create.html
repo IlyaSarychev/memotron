@@ -219,7 +219,17 @@
             })
                 .then(req => req.json())
                 .then(data => {
-                    console.log(data)
+
+                    if (data.errors != null) {
+
+                    }
+                    
+                    if (data.success) {
+                        form[0].reset()
+                        $('input[name="question"]').prop('checked', false)
+                        $('input[name="answer"]').prop('checked', false)
+                        form.find('.badge').hide()
+                    }
                 })
         })
     })

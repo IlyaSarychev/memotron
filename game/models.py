@@ -60,9 +60,11 @@ class Deck(models.Model):
                               blank=True,
                               null=True)
     questions = models.ManyToManyField(Question, related_name='decks',
-                                        verbose_name='Вопросы')
+                                        verbose_name='Вопросы',
+                                        blank=True)
     answers = models.ManyToManyField(Answer, related_name='decks',
-                                        verbose_name='Ответы')
+                                        verbose_name='Ответы',
+                                        blank=True)
     is_published = models.BooleanField('Ответ опубликован?', 
                                         default=False)
     created = models.DateTimeField('Дата создания', 

@@ -235,12 +235,13 @@ def ajax_create_deck(request):
             deck.questions.add(*[int(i) for i in request.POST.get('questions').split(',')])
         if len(request.POST.get('answers')) > 0:
             deck.answers.add(*[int(i) for i in request.POST.get('answers').split(',')])
+        deck.save()
         return JsonResponse({
             'success': True,
             'deck': {
                 'title': deck.title,
                 'text': deck.text,
-                'image': deck.image.url,
+                'image': deck.image.url if deck.image else None,
                 'is_published': deck.is_published,
                 'created': deck.created
             },
