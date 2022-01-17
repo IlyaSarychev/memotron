@@ -16,5 +16,6 @@ urlpatterns = [
     path('ajax-delete-answer/<int:answer_id>', views.ajax_delete_answer, name='ajax_delete_answer'),
 
     # колода
-    path('create-deck/', views.create_deck_view, name='create_deck')
+    path('create-deck/', views.create_deck_view, name='create_deck'),
+    path('ajax-create-deck/', views.ajax_create_deck, name='ajax_create_deck')
 ]

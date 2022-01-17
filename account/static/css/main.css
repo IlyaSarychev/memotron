@@ -112,6 +112,10 @@
     cursor: pointer;
 }
 
+.modal-a.checked {
+    box-shadow: 0px 0px 0 5px rgb(13,110,253);
+}
+
 .modal-a__label {
     cursor: pointer;
     position: relative;

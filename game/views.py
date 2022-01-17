@@ -1,3 +1,4 @@
+import re
 from django.core.exceptions import ValidationError
 from django.http.response import JsonResponse
 from django.shortcuts import render
@@ -203,16 +204,51 @@ class DeckListView(ListView):
 def create_deck_view(request):
     '''Страница создания колоды'''
 
-    if request.method == 'POST':
-        pass
-    else:
-        user = request.user
-        form = CreateDeckForm()
-        questions = user.questions.all()
-        answers = user.answers.all()
+    user = request.user
+    form = CreateDeckForm()
+    questions = user.questions.all()
+    answers = user.answers.all()
     return render(request, 'deck/create.html', 
                     {
                         'form': form,
                         'questions': questions,
                         'answers': answers
                     })
+
+
+@login_required
+@require_POST
+def ajax_create_deck(request):
+    '''Обработка AJAX-запроса на создание колоды'''
+
+    if not is_ajax(request):
+        return HttpResponseForbidden()
+
+    form = CreateDeckForm(request.POST, request.FILES)
+    if form.is_valid():
+        deck = form.save(commit=False)
+        deck.user = request.user
+        # нужно сохранить объект в базе данных прежде, чем добавлять many-to-many значения
+        # это нужно, чтобы у объекта в бд появился id
+        deck.save()
+        if len(request.POST.get('questions')) > 0:
+            deck.questions.add(*[int(i) for i in request.POST.get('questions').split(',')])
+        if len(request.POST.get('answers')) > 0:
+            deck.answers.add(*[int(i) for i in request.POST.get('answers').split(',')])
+        return JsonResponse({
+            'success': True,
+            'deck': {
+                'title': deck.title,
+                'text': deck.text,
+                'image': deck.image.url,
+                'is_published': deck.is_published,
+                'created': deck.created
+            },
+            'errors': dict(form.errors)
+        })
+    else:
+        return JsonResponse({
+            'success': False,
+            'deck': None,
+            'errors': dict(form.errors)
+        })

@@ -8,7 +8,7 @@
         <div class="row mt-5">
             <div class="col-12">
                 <h1 class="mb-4">Создать колоду</h1>
-                <form action="{% url 'game:create_deck' %}" method="post" enctype="multipart/form-data">
+                <form id="deckCreateForm" action="{% url 'game:create_deck' %}" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="row">
                         {% for field in form.visible_fields %}
@@ -177,8 +177,10 @@
 
             if ($(this).is(':checked')) {
                 answers.add(aId)
+                $(this).closest('.modal-a').addClass('checked')
             } else {
                 answers.delete(aId)
+                $(this).closest('.modal-a').removeClass('checked')
             }
 
             const badge = $('.answers-button').find('.badge')
@@ -189,8 +191,36 @@
                 badge.text(answers.size)
                 badge.removeClass('d-none')
             }
+        })
 
-            console.log(answers)
+
+        // отправка формы
+        const form = $('#deckCreateForm')
+
+        form.submit(function(e) {
+            e.preventDefault()
+
+            let data = new FormData()
+
+            data.append('title', form.find('[name="title"]').val())
+            data.append('text', form.find('[name="text"]').val())
+            data.append('image', form.find('[name="image"]')[0].files[0])
+            data.append('questions', [...questions.values()])
+            data.append('answers', [...answers.values()])
+            data.append('is_published', form.find('[name="is_published"]').is(':checked'))
+
+            fetch('/ajax-create-deck/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: data
+            })
+                .then(req => req.json())
+                .then(data => {
+                    console.log(data)
+                })
         })
     })
 </script>
