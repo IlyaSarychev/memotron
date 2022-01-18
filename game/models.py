@@ -78,3 +78,15 @@ class Deck(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_question_ids(self, template=True):
+        '''Получить список id вопросов конкретной колоды.
+        Если template=True, то список вернется в отформатированном для шаблона виде'''
+        if template:
+            return ','.join([str(q['id']) for q in self.questions.values('id')])
+
+    def get_answer_ids(self, template=True):
+        '''Получить список id ответов конкретной колоды.
+        Если template=True, то список вернется в отформатированном для шаблона виде'''
+        if template:
+            return ','.join([str(a['id']) for a in self.answers.values('id')])

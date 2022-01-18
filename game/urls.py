@@ -20,4 +20,5 @@ urlpatterns = [
     path('my-decks/', views.DeckListView.as_view(), name='my_decks'),
     path('ajax-create-deck/', views.ajax_create_deck, name='ajax_create_deck'),
     path('ajax-delete-deck/<int:deck_id>', views.ajax_delete_deck, name='ajax_delete_deck'),
+    path('ajax-update-deck/<int:deck_id>', views.ajax_update_deck, name='ajax_update_deck'),
 ]

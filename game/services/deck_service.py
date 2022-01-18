@@ -33,3 +33,30 @@ def delete_deck(deck_id, user):
     чтобы пользователь удалял только свои колоды'''
     
     return Deck.objects.filter(id=deck_id, user__id=user.id).delete()[0]
+
+
+def update_deck(deck_id, user, data):
+    '''Изменить колоду по id. Необходимо передать user, 
+    чтобы пользователь изменял только свои колоды.
+    В объекте data хранятся данные для изменения'''
+
+    d = Deck.objects.filter(id=deck_id, user__id=user.id).get()
+
+    title = data.get('title', None)
+    is_published = data.get('is_published', None)
+    questions = data.get('question_ids', None)
+    answers = data.get('answer_ids', None)
+
+    if title: d.title = title
+    if is_published: d.is_published = True if is_published == 'true' else False
+
+    d.questions.clear()
+    if questions:
+        d.questions.add(*[int(i) for i in questions.split(',')])
+
+    d.answers.clear()
+    if answers:
+        d.answers.add(*[int(i) for i in answers.split(',')])
+
+    d.save()
+    return d

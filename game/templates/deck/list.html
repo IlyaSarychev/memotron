@@ -16,19 +16,70 @@
                             <th>Вопросы</th>
                             <th>Ответы</th>
                             <th>Всего карточек</th>
+                            <th>Опубликована</th>
                             <th></th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for d in deck_list %}
-                            <tr data-id="{{ d.id }}">
+                            <tr 
+                                data-id="{{ d.id }}"
+                                data-question-ids="{{ d.get_question_ids }}"
+                                data-answer-ids="{{ d.get_answer_ids }}"
+                            >
                                 <th>{{ forloop.counter }}</th>
-                                <td><span>{{ d.title }}</span></td>
-                                <td><span>{{ d.questions.count }}</span></td>
-                                <td><span>{{ d.answers.count }}</span></td>
-                                <td><span>{{ d.questions.count|add:d.answers.count }}</span></td>
+                                <td><span class="title">{{ d.title }}</span></td>
+                                <td>
+                                    <span class="q-count">{{ d.questions.count }}</span>
+                                    <button 
+                                        class="btn btn-primary position-relative questions-button" 
+                                        style="display: none;"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#questionsModal"
+                                    >
+                                        <span>Вопросы</span>
+                                        <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill">{{ d.questions.count }}</span>
+                                    </button>
+                                </td>
+                                <td>
+                                    <span class="a-count">{{ d.answers.count }}</span>
+                                    <button 
+                                        class="btn btn-primary position-relative answers-button" 
+                                        style="display: none;"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#answersModal"
+                                    >
+                                        <span>Ответы</span>
+                                        <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill">{{ d.answers.count }}</span>
+                                    </button>
+                                </td>
+                                <td><span class="total">{{ d.questions.count|add:d.answers.count }}</span></td>
+                                <td>
+                                    <span class="is_published">
+                                        {% if d.is_published %}
+                                            Да
+                                        {% else %}
+                                            Нет
+                                        {% endif %}
+                                    </span>
+                                </td>
                                 <td>
                                     <div class="deck-buttons-wrapper">
+                                        <button 
+                                            class="save-deck btn btn-outline-success"
+                                            type="button"
+                                            style="display: none;"
+                                            data-id="{{ d.id }}"
+                                        >
+                                            Сохранить
+                                        </button>
+                                        <button 
+                                            class="update-deck btn btn-outline-primary"
+                                            type="button"
+                                            data-id="{{ d.id }}"
+                                        >
+                                            Редактировать
+                                        </button>
                                         <button 
                                             class="delete-deck btn btn-outline-danger"
                                             type="button"
@@ -52,6 +103,81 @@
         </div>
     </div>
 </main>
+
+<div class="modal" id="questionsModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Выберите вопросы</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-q-list">
+                    {% for q in request.user.questions.all %}
+                        <div class="form-check">
+                            <input 
+                                class="form-check-input" 
+                                name="question" 
+                                type="checkbox" 
+                                value="{{ q.id }}" 
+                                id="question{{q.id}}"
+                            >
+                            <label class="form-check-label" for="question{{q.id}}">
+                                {{q.text}}
+                            </label>
+                        </div>
+                    {% empty %}
+                        <p>
+                            Вы еще не создавали свои вопросы. 
+                            <a href="{% url 'game:create_question_or_answer' %}">Создать</a>
+                        </p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="answersModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Выберите ответы</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-a-list">
+                    {% for a in request.user.answers.all %}
+                        <div class="modal-a">
+                            <input type="checkbox" name="answer" class="d-none modal-a__input" value="{{ a.id }}" id="answer{{ a.id }}">
+                            <label class="m-0 d-block modal-a__label" for="answer{{ a.id }}">
+                                <img src="{{ a.image.url }}" alt="" class="modal-a__img">
+                                <p class="modal-a__text">
+                                    {% if a.text %}
+                                        {{a.text}}
+                                    {% else %}
+                                        <span class="secondary">[Описание отсутствует]</span>
+                                    {% endif %}
+                                </p>
+                            </label>
+                        </div>
+                    {% empty %}
+                    <p>
+                        Вы еще не создавали свои ответы. 
+                        <a href="{% url 'game:create_question_or_answer' %}">Создать</a>
+                    </p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block js_scripts_after %}
@@ -71,6 +197,219 @@
                 .then(data => {
                     if (data.success) {
                         $(`tr[data-id="${deckId}"]`).remove()
+                    }
+                })
+        })
+
+
+        // редактирование
+
+        $('.update-deck').click(function() {
+            const deckId = Number($(this).attr('data-id'))
+            const tr = $(`tr[data-id="${deckId}"]`)
+
+            tr.find('.deck-buttons-wrapper .btn').hide()
+            tr.find('.deck-buttons-wrapper .save-deck').show()
+            tr.find('.q-count, .a-count').hide()
+            tr.find('.questions-button, .answers-button').show()
+
+            const title = tr.find('span.title')
+            const titleInitial = title.text()
+
+            title.replaceWith(
+                `<input type="text" id="title${deckId}" name="title" value="${titleInitial}" class="form-control">`
+            )
+            const titleField = tr.find('#title' + deckId)
+            titleField.on('input', function() {
+                if ($(this).val() !== titleInitial) {
+                    $(this).addClass('changed')
+                } else {$(this).removeClass('changed')}
+            })
+
+            const qCount = tr.find('span.q-count')
+            const qCountInitial = qCount.text()
+
+            const aCount = tr.find('span.a-count')
+            const aCountInitial = aCount.text()
+
+            const published = tr.find('.is_published')
+            published.replaceWith(`
+                <div class="form-check question-is-published-field">
+                    <input class="form-check-input" name='is_published' id="answer_${deckId}" type="checkbox" 
+                        ${published.text() == 'Да' ? 'checked' : ''}>
+                    <label class="form-check-label" for="answer_${deckId}">
+                        Опубликована?
+                    </label>
+                </div>
+            `)
+            const publishedField = tr.find("[name='is_published']")
+            const publishedInitial = publishedField.is(':checked')
+            publishedField.on('change', function() {
+                if ($(this).is(':checked') !== publishedInitial) {
+                    $(this).addClass('changed')
+                } else {
+                    $(this).removeClass('changed')
+                }
+            })
+
+            // расставить ответы
+            const answerIds = tr.attr('data-answer-ids').split(',').map(idStr => +idStr)
+            let modal = $('#answersModal')
+
+            // сначала сбросить
+            modal.find('.modal-a').removeClass('checked')
+            modal.find('input').prop('checked', false)
+
+            answerIds.forEach(function(id) {
+                const field = modal.find('input#answer' + id)
+                field.prop('checked', true)
+                field.closest('.modal-a').addClass('checked')
+            })
+
+            // расставить вопросы
+            const questionIds = tr.attr('data-question-ids').split(',').map(idStr => +idStr)
+            modal = $('#questionsModal')
+
+            // сначала сбросить
+            modal.find('input').prop('checked', false)
+
+            questionIds.forEach(function(id) {
+                modal.find('input#question' + id).prop('checked', true)
+            })
+        })
+
+        $('.answers-button').click(function() {
+            const tr = $(this).closest('tr')
+            const modal = $('#answersModal')
+            
+            // собрать начальные значения
+            answersInitial = {}
+            modal.find('input').each(function(idx, el) {
+                answersInitial[$(el).attr('id')] = $(el).is(':checked')
+            })
+            // добавить события
+            const answersButton = tr.find('.answers-button')
+            function changeInputHandler() {
+                const aBlock = $(this).closest('.modal-a')
+                if ($(this).is(':checked') !== answersInitial[$(this).attr('id')]) {
+                    $(this).addClass('changed')
+                } else {
+                    $(this).removeClass('changed')      
+                }
+
+                if ($(this).is(':checked')) {
+                    aBlock.addClass('checked')
+                } else {
+                    aBlock.removeClass('checked')
+                }
+
+                // обновить бейджи количества
+                answersButton.find('.badge').text(modal.find('input:checked').length)
+                tr.find('.total').text($('#answersModal, #questionsModal').find('input:checked').length)
+            }
+            modal.find('input').off('change', changeInputHandler)
+            modal.find('input').change(changeInputHandler)
+        })
+
+        $('.questions-button').click(function() {
+            const tr = $(this).closest('tr')
+            const modal = $('#questionsModal')
+
+            // собрать начальные значения
+            questionsInitial = {}
+            modal.find('input').each(function(idx, el) {
+                questionsInitial[$(el).attr('id')] = $(el).is(':checked')
+            })
+            // добавить события
+            const questionsButton = tr.find('.questions-button')
+            function changeInputHandler() {
+                if ($(this).is(':checked') !== questionsInitial[$(this).attr('id')]) {
+                    $(this).addClass('changed')
+                } else {
+                    $(this).removeClass('changed')      
+                }
+
+                // обновить бейджи количества
+                questionsButton.find('.badge').text(modal.find('input:checked').length)
+                tr.find('.total').text($('#answersModal, #questionsModal').find('input:checked').length)
+            }
+            modal.find('input').off('change', changeInputHandler)
+            modal.find('input').change(changeInputHandler)
+        })
+
+        $('.save-deck').click(function() {
+            const deckId = Number($(this).attr('data-id'))
+            const tr = $(`tr[data-id="${deckId}"]`)
+
+            let changed = false
+
+            let data = new FormData()
+
+            tr.find('.changed[type="text"]').each(function(i, el) {
+                data.append($(el).attr('name'), $(el).val())
+            })
+
+            tr.find('.changed[type="checkbox"]').each(function(i, el) {
+                data.append($(el).attr('name'), $(el).is(':checked'))
+            })
+
+            const changedQuestions = $('#questionsModal input:checked')
+            const changedAnswers = $('#answersModal input:checked')
+            
+            if (changedQuestions.length) {
+
+                let ids = new Set()
+
+                changedQuestions.each(function(i, el) {
+                    ids.add(+$(el).val())
+                })
+
+                data.append('question_ids', [...ids.values()])
+            }
+
+            if (changedAnswers.length) {
+
+                let ids = new Set()
+
+                changedAnswers.each(function(i, el) {
+                    ids.add(+$(el).val())
+                })
+
+                data.append('answer_ids', [...ids.values()])
+            }
+
+            
+            fetch('/ajax-update-deck/' + deckId, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: data
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const tr = $(`tr[data-id="${data.deck.id}"]`)
+
+                        tr.find('input[name="title"]').replaceWith(
+                            `<span class="title">${data.deck.title}</span>`
+                        )
+
+                        tr.find('input[name="is_published"]').closest('.question-is-published-field').replaceWith(
+                            `<span class="is_published">${data.deck.is_published ? 'Да' : 'Нет'}</span>`
+                        )
+
+                        tr.attr('data-question-ids', data.deck.questions.length ? data.deck.questions.join(',') : '')
+                        tr.attr('data-answer-ids', data.deck.answers.length ? data.deck.answers.join(',') : '')
+
+                        tr.find('.deck-buttons-wrapper .btn').show()
+                        tr.find('.deck-buttons-wrapper .save-deck').hide()
+                        tr.find('.q-count, .a-count').show()
+                        tr.find('.q-count').text(data.deck.questions.length)
+                        tr.find('.a-count').text(data.deck.answers.length)
+                        tr.find('.total').text(data.deck.questions.length + data.deck.answers.length)
+                        tr.find('.questions-button, .answers-button').hide()
                     }
                 })
         })

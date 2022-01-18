@@ -263,3 +263,27 @@ def ajax_delete_deck(request, deck_id):
         return JsonResponse({
             'success': False
         })
+
+
+@login_required
+@require_POST
+def ajax_update_deck(request, deck_id):
+    '''Обработка AJAX-запроса на изменение колоды'''
+
+    if not is_ajax(request):
+        return HttpResponseForbidden()
+
+    try:
+        deck = deck_service.update_deck(deck_id, request.user, request.POST)
+        return JsonResponse({
+            'success': True,
+            'deck': {
+                'id': deck.id,
+                'title': deck.title,
+                'is_published': deck.is_published,
+                'questions': [q['id'] for q in deck.questions.values('id')],
+                'answers': [a['id'] for a in deck.answers.values('id')]
+            } 
+        })
+    except Exception as err:
+        raise err
