@@ -287,3 +287,22 @@ def ajax_update_deck(request, deck_id):
         })
     except Exception as err:
         raise err
+
+
+# главная
+@login_required
+def main_page_view(request):
+    '''Главная страница, на которой будет отображаться различная информация'''
+    pass
+
+
+# игра
+@login_required
+def play_view(request):
+    pass
+
+
+@login_required
+def create_game_view(request):
+    '''Страница создания игры'''
+    return render(request, 'game/create.html')

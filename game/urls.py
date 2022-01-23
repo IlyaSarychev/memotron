@@ -21,4 +21,11 @@ urlpatterns = [
     path('ajax-create-deck/', views.ajax_create_deck, name='ajax_create_deck'),
     path('ajax-delete-deck/<int:deck_id>', views.ajax_delete_deck, name='ajax_delete_deck'),
     path('ajax-update-deck/<int:deck_id>', views.ajax_update_deck, name='ajax_update_deck'),
+
+    # главная
+    # path('',)
+
+    # игра
+    # path('play/'),
+    path('create-game/', views.create_game_view, name='create_game'),
 ]
