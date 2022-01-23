@@ -33,8 +33,12 @@ def account_register_new_user(request):
 
 
 @login_required
-def account_profile(request, profile_id):
+def account_profile(request, profile_id=None):
     '''Страница профиля'''
+    if not profile_id:
+        profile = get_object_or_404(Profile, id=request.user.profile.id)
+        return render(request, 'account/profile/detail.html',
+                            {'profile': profile})
     profile = get_object_or_404(Profile, id=profile_id)
     return render(request, 'account/profile/detail.html',
                             {'profile': profile})
