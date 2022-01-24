@@ -9,7 +9,7 @@
         <div class="row mt-5">
             <div class="col-lg-6 offset-lg-3">
                 <h1>Регистрация</h1>
-                <p class="mb-5">Введите свои данные в форму ниже:</p>
+                <p class="mb-5"><a href="{% url 'account:login' %}">Войдите</a> или введите свои данные в форму ниже:</p>
                 <form action="." method="post" class="mb-5">
                     {% csrf_token %}
                     {% for field in form %}

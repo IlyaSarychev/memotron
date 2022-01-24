@@ -23,7 +23,7 @@ def account_register_new_user(request):
         form = AccountRegistrationForm(request.POST)
         success = register_new_user(form)
         if success:
-            return redirect('account:account_profile')
+            return redirect('account:self_account_profile')
         else:
             return render(request, 'account/registration.html', {'form': form})
     else:

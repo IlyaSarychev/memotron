@@ -11,7 +11,7 @@ def register_new_user(form):
         user.save()
         # добавление дополнительного id для отображения
         extra_id = ('0000' + str(user.id))[-4:]
-        Profile.objects.create(user=user, name=cd['first_name'], extra_id=extra_id)
+        Profile.objects.create(user=user, extra_id=extra_id)
         return True
     else:
         return False
