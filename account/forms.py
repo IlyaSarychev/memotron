@@ -11,7 +11,8 @@ class AccountLoginForm(AuthenticationForm):
                 'class': 'form-control',
                 'placeholder': ''
             }
-        )
+        ),
+        label='Логин'
     )
     password = forms.CharField(
         label='Пароль',
@@ -42,6 +43,7 @@ class AccountRegistrationForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'form-control'
+        self['username'].label = 'Логин'
 
     def is_valid(self):
          result = super().is_valid()
