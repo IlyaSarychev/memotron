@@ -148,5 +148,12 @@ INTERNAL_IPS = [
 
 
 # Логин, логаут настройки
+
 LOGIN_REDIRECT_URL = '/account/profile/'
 LOGIN_URL = LOGOUT_REDIRECT_URL = '/account/login/'
+
+
+# настройки redis
+
+REDIS_HOST = '127.0.0.1'
+REDIS_PORT = '6379'

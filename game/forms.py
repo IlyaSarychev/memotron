@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Deck, Question, Answer
+from .models import Deck, Game, Question, Answer
 from account.services.utils.forms import process_form_fields
 
 
@@ -41,5 +41,11 @@ class CreateDeckForm(forms.ModelForm):
         super().__init__(*args, *kwargs)
         # изменение полей формы и их виджетов (например, добавление классов bootstrap)
         process_form_fields(self, checked=True, textarea_rows=1)
-        
+
+
+class CreateGameForm(forms.ModelForm):
+    '''Форма создания игры'''
     
+    class Meta:
+        model = Game
+        fields = ('players', 'is_active', 'deck')

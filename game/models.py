@@ -90,3 +90,26 @@ class Deck(models.Model):
         Если template=True, то список вернется в отформатированном для шаблона виде'''
         if template:
             return ','.join([str(a['id']) for a in self.answers.values('id')])
+
+
+
+class Game(models.Model):
+    '''Модель игры. Содержит некоторые данные об игре. Основные данные хранятся в Redis во время игры.'''
+
+    user = models.ForeignKey('auth.user', on_delete=models.CASCADE,
+                            related_name='games')
+    players = models.ManyToManyField('auth.user', related_name='game', through='Membership')
+    is_active = models.BooleanField('Игра запущена?', db_index=True,
+                                    default=False)
+    deck = models.OneToOneField(Deck, on_delete=models.CASCADE, 
+                                        related_name='game')
+    created = models.DateTimeField('Дата создания игры', auto_now_add=True)
+
+
+class Membership(models.Model):
+    '''Модель для связи many-to-many User и Game, чтобы хранить дополнительные поля'''
+
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='memberships')
+    user = models.ForeignKey('auth.user', on_delete=models.CASCADE, related_name='memberships')
+    answers = models.IntegerField('Количество ответов всего', default=0)
+    wins = models.IntegerField('Количество побед', default=0)

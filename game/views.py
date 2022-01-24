@@ -296,13 +296,3 @@ def main_page_view(request):
     pass
 
 
-# игра
-@login_required
-def play_view(request):
-    pass
-
-
-@login_required
-def create_game_view(request):
-    '''Страница создания игры'''
-    return render(request, 'game/create.html')

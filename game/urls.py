@@ -27,5 +27,5 @@ urlpatterns = [
 
     # игра
     # path('play/'),
-    path('create-game/', views.create_game_view, name='create_game'),
+    # path('create-game/', views.create_game_view, name='create_game'),
 ]

@@ -73,7 +73,12 @@
                             <a href="#" class="btn btn-success ms-2">Играть</a>
                         </li>
                         <li class="nav-item">
-                            <a href="{% url 'game:create_game' %}" class="btn btn-info ms-2">Создать игру</a>
+                            <a 
+                                href="#"
+                                class="btn btn-info ms-2"
+                                data-bs-target="#createGame"
+                                data-bs-toggle="modal"
+                            >Создать игру</a>
                         </li>
                         <li class="nav-item dropdown ms-auto">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
