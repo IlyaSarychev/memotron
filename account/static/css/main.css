@@ -192,3 +192,10 @@
     justify-content: flex-end;
     gap: 10px;
 }
+
+.add-friend {
+    padding: 5px;
+    border-radius: 50%;
+    height: 35px;
+    width: 35px;
+}

@@ -11,11 +11,11 @@
             <div class="col-md-4">
                 <div class="profile-photo-wrapper">
                     {% if profile.photo %}
-                        {% thumbnail profile.photo "350x350" crop="center" as im %}
-                            <img class="profile-photo" src="{{ im.url }}" alt="Profile photo">
-                        {% endthumbnail %}
+                    {% thumbnail profile.photo "350x350" crop="center" as im %}
+                    <img class="profile-photo" src="{{ im.url }}" alt="Profile photo">
+                    {% endthumbnail %}
                     {% else %}
-                        <img class="profile-photo" src="{% static 'img/no_profile_picture.png' %}" alt="No photo">
+                    <img class="profile-photo" src="{% static 'img/no_profile_picture.png' %}" alt="No photo">
                     {% endif %}
                     {% if profile.id == request.user.profile.id %}
                     <form class="profile-photo-form" action="." method="post" enctype="multipart/form-data">
@@ -46,20 +46,114 @@
                         <p>Ответов создано: {{ user.answers.count }}</p>
                     </div>
                     <div class="w-100"></div>
-                    <!-- <div class="col-md-4">
-                        <p>Подписки ()</p>
-                    </div> -->
+                    <div class="col-md-8">
+                        <p class="d-flex align-items-center">
+                            Друзей ({{profile.friends.count}})
+                            <span class="btn btn-success add-friend ms-2" data-bs-target="#addFriend"
+                                data-bs-toggle='modal'>
+                                <i class="bi bi-plus-circle"></i>
+                            </span>
+                        </p>
+                        <div class="d-flex overflow-auto">
+                            {% for friend in profile.frineds %}
+
+                            {% empty %}
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </main>
+
+<div class="modal fade" id="addFriend" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Добавить в друзья</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="#" id="#inviteFriendsForm" method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="name_search" class="form-label">
+                            Введите логин или имя пользователя. <br>
+                            <small class="text-muted">Введите идентификатор через # для более точного поиска</small>
+                        </label>
+                        <input type="search" id="name_search" name="name" placeholder="Имя#0000" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary send-invites">Отправить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
-{% block js_scripts_before %}
+{% block js_scripts_after %}
+
+<script>
+    window.throttle = function(func, wait, options) {
+        var context, args, result;
+        var timeout = null;
+        var previous = 0;
+        if (!options) options = {};
+        var later = function () {
+            previous = options.leading === false ? 0 : Date.now();
+            timeout = null;
+            result = func.apply(context, args);
+            if (!timeout) context = args = null;
+        };
+        return function () {
+            var now = Date.now();
+            if (!previous && options.leading === false) previous = now;
+            var remaining = wait - (now - previous);
+            context = this;
+            args = arguments;
+            if (remaining <= 0 || remaining > wait) {
+                if (timeout) {
+                    clearTimeout(timeout);
+                    timeout = null;
+                }
+                previous = now;
+                result = func.apply(context, args);
+                if (!timeout) context = args = null;
+            } else if (!timeout && options.trailing !== false) {
+                timeout = setTimeout(later, remaining);
+            }
+            return result;
+        };
+    };
+</script>
 
 <script>
     window.imgChangeURL = "{% url 'account:profile_change_photo' %}"
+
+    $(document).ready(function() {
+
+        const inviteForm = $('#inviteFriendsForm')
+
+        function searchFieldHandle() {
+            const text = $(this).val()
+            const [name, id=null] = text.split('#')
+            
+            // fetch('')
+        }
+
+        searchFieldHandle1000 = throttle(searchFieldHandle, 1000)
+
+        inviteForm.find('input[name="name"]').on('input', searchFieldHandle1000)
+
+        $('.send-invites').click(function() {
+            //
+        })
+    })
 </script>
 
 {% endblock %}
