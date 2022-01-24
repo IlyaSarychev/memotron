@@ -98,11 +98,16 @@ class Game(models.Model):
 
     user = models.ForeignKey('auth.user', on_delete=models.CASCADE,
                             related_name='games')
-    players = models.ManyToManyField('auth.user', related_name='game', through='Membership')
+    players = models.ManyToManyField('auth.user', 
+                                     related_name='game', 
+                                     through='Membership', 
+                                     verbose_name='Игроки')
     is_active = models.BooleanField('Игра запущена?', db_index=True,
                                     default=False)
-    deck = models.OneToOneField(Deck, on_delete=models.CASCADE, 
-                                        related_name='game')
+    deck = models.OneToOneField(Deck, 
+                                on_delete=models.CASCADE,
+                                related_name='game',
+                                verbose_name='Колода')
     created = models.DateTimeField('Дата создания игры', auto_now_add=True)
 
 

@@ -45,7 +45,22 @@ class CreateDeckForm(forms.ModelForm):
 
 class CreateGameForm(forms.ModelForm):
     '''Форма создания игры'''
+
+    players = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'type': 'search'
+            }
+        ),
+        required=False,
+        label='Игроки'
+    )
     
     class Meta:
         model = Game
-        fields = ('players', 'is_active', 'deck')
+        fields = ('players', 'deck')
+
+    
+    def __init__(self, *args, **kwargs):
+        forms.ModelForm.__init__(self, *args, *kwargs)
+        process_form_fields(self)

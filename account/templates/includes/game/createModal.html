@@ -1,20 +1,29 @@
 <div class="modal fade" id="createGame" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Создать игру</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form action="#" method="post">
-            {% csrf_token %}
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Создать игру</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				{% with form=create_game_form %}
+				<form action="#" method="post">
+					{% csrf_token %}
 
-            {{create_game_form}}
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary">Создать</button>
-      </div>
-    </div>
-  </div>
+					{% for field in form %}
+						<div class="mb-3">
+							<label for="{{field.auto_id}}" class="form-label">{{field.label}}</label>
+							{{field}}
+						</div>
+					{% endfor %}
+
+					<button type="submit" class="btn btn-primary">Отправить (временно)</button>
+				</form>
+				{% endwith %}
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary">Создать</button>
+			</div>
+		</div>
+	</div>
 </div>
