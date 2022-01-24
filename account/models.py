@@ -10,4 +10,14 @@ class Profile(models.Model):
                             null=True,
                             blank=True)
     birth_date = models.DateTimeField('Дата рождения', null=True, blank=True)
+    friends = models.ManyToManyField('self', through='Following')
+    registered = models.DateTimeField('Зарегистрирован', auto_now_add=True)
+    extra_id = models.CharField('Идентификатор', max_length=4, db_index=True)
 
+
+class Following(models.Model):
+    '''Класс m2m для системы подписок пользователей друг на друга'''
+
+    friend1 = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='friend1')
+    friend2 = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='friend2')
+    date = models.DateTimeField('Начало дружбы', auto_now_add=True)
