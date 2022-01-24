@@ -2,6 +2,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark bg-gradient">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Memotron</a>
+            {% if request.user.is_authenticated %}
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
                 aria-label="Toggle navigation">
@@ -68,46 +69,45 @@
                             </li>
                         </ul>
                     </li>
-                    {% if request.user.is_authenticated %}
-                        <li class="nav-item">
-                            <a href="#" class="btn btn-success ms-2">Играть</a>
-                        </li>
-                        <li class="nav-item">
-                            <a 
-                                href="#"
-                                class="btn btn-info ms-2"
-                                data-bs-target="#createGame"
-                                data-bs-toggle="modal"
-                            >Создать игру</a>
-                        </li>
-                        <li class="nav-item dropdown ms-auto">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                {{ request.user.first_name }}
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li>
-                                    <a 
-                                        class="dropdown-item" 
-                                        href="{% url 'account:self_account_profile' %}"
-                                    >
-                                        Профиль
-                                    </a>
-                                </li>
-                                <li><a class="dropdown-item" href="#">Another action</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="{% url 'account:logout' %}">Выйти</a></li>
-                            </ul>
-                        </li>
-                    {% endif %}
+                    <li class="nav-item">
+                        <a href="#" class="btn btn-success ms-2">Играть</a>
+                    </li>
+                    <li class="nav-item">
+                        <a 
+                            href="#"
+                            class="btn btn-info ms-2"
+                            data-bs-target="#createGame"
+                            data-bs-toggle="modal"
+                        >Создать игру</a>
+                    </li>
+                    <li class="nav-item dropdown ms-auto">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ request.user.first_name }}
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li>
+                                <a 
+                                    class="dropdown-item" 
+                                    href="{% url 'account:self_account_profile' %}"
+                                >
+                                    Профиль
+                                </a>
+                            </li>
+                            <li><a class="dropdown-item" href="#">Another action</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="{% url 'account:logout' %}">Выйти</a></li>
+                        </ul>
+                    </li>
                 </ul>
                 <!-- <form class="d-flex">
                     <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
                     <button class="btn btn-outline-light" type="submit">Search</button>
                 </form> -->
             </div>
+            {% endif %}
         </div>
     </nav>
 </header>
