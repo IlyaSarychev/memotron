@@ -28,17 +28,14 @@ def search_profiles(parameters):
     '''Поиск пользователей и их профилей. Необходимо передать параметры поиска (dict)'''
 
     filters = {}
-
     if 'name' in parameters:
         if 'id' in parameters: 
             filters['profile__extra_id__startswith'] = parameters.get('id')
             filters['first_name__iexact'] = parameters.get('name')
         else:
             filters['first_name__istartswith'] = parameters.get('name')
-        
 
     users = User.objects.filter(**filters)[:10]
-
     data = {
         'users': []
     }
@@ -52,3 +49,8 @@ def search_profiles(parameters):
         })
 
     return data
+
+
+def invite_friends(from_user, to_users):
+    '''Пригласить друзей'''
+    pass

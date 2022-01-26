@@ -1,4 +1,3 @@
-import profile
 from django.http.response import JsonResponse
 from django.shortcuts import redirect, render
 from django.contrib.auth import views as auth_views
@@ -69,3 +68,13 @@ def ajax_search_profiles(request):
     data = search_profiles(request.GET)
 
     return JsonResponse(data)
+
+
+
+@require_POST
+@login_required
+def ajax_invite_friends(request):
+    '''Приглашение в друзья через AJAX'''
+
+    if not is_ajax(request):
+        return HttpResponseForbidden()

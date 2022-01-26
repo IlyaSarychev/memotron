@@ -14,4 +14,5 @@ urlpatterns = [
     path('profile/<int:profile_id>/', views.account_profile, name='account_profile'),
     path('profile/photo/change/', views.profile_change_photo, name='profile_change_photo'),
     path('ajax-search-profiles', views.ajax_search_profiles, name='ajax_search_profiles'),
+    path('ajax-invite-friends/', views.ajax_invite_friends, name='ajax_invite_friends'),
 ]

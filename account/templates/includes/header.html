@@ -89,7 +89,7 @@
                             data-bs-toggle="dropdown" aria-expanded="false">
                             {{ request.user.first_name }}
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             <li>
                                 <a 
                                     class="dropdown-item" 
@@ -98,7 +98,12 @@
                                     Профиль
                                 </a>
                             </li>
-                            <li><a class="dropdown-item" href="#">Приглашения</a></li>
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    Уведомления
+                                    <span class="badge bg-warning text-dark">4</span>
+                                </a>
+                            </li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
