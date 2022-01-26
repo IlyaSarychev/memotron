@@ -1,14 +1,15 @@
+import profile
 from django.http.response import JsonResponse
 from django.shortcuts import redirect, render
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseForbidden
 from .forms import AccountLoginForm, AccountRegistrationForm
 from .models import Profile
 from .services.registration import register_new_user
-from .services.profile import change_profile_photo
+from .services.profile import change_profile_photo, search_profiles
 from .services.utils.ajax import is_ajax
 
 
@@ -55,3 +56,16 @@ def profile_change_photo(request):
             return JsonResponse({'error': 'Что-то пошло не так'})
     else:
         return HttpResponseForbidden()
+
+
+@require_GET
+@login_required
+def ajax_search_profiles(request):
+    '''Поиск пользователей через AJAX'''
+    
+    if not is_ajax(request):
+        return HttpResponseForbidden()
+
+    data = search_profiles(request.GET)
+
+    return JsonResponse(data)

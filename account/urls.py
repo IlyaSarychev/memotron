@@ -1,8 +1,6 @@
 from django import urls
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from django.conf import settings
-from django.conf.urls.static import static
 from . import views
 
 
@@ -14,5 +12,6 @@ urlpatterns = [
     path('registration/', views.account_register_new_user, name='registration'),
     path('profile/', views.account_profile, name='self_account_profile'),
     path('profile/<int:profile_id>/', views.account_profile, name='account_profile'),
-    path('profile/photo/change/', views.profile_change_photo, name='profile_change_photo')
+    path('profile/photo/change/', views.profile_change_photo, name='profile_change_photo'),
+    path('ajax-search-profiles', views.ajax_search_profiles, name='ajax_search_profiles'),
 ]

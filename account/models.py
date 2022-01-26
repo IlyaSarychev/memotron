@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 
 class Profile(models.Model):
@@ -13,6 +14,9 @@ class Profile(models.Model):
     friends = models.ManyToManyField('self', through='Following')
     registered = models.DateTimeField('Зарегистрирован', auto_now_add=True)
     extra_id = models.CharField('Идентификатор', max_length=4, db_index=True)
+
+    def get_absolute_url(self):
+        return reverse('account:account_profile', args=[self.id])
 
 
 class Following(models.Model):

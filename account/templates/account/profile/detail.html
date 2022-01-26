@@ -75,15 +75,26 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="#" id="#inviteFriendsForm" method="post">
+                <form action="#" id="inviteFriendsForm" method="post">
                     {% csrf_token %}
 
-                    <div class="mb-3">
-                        <label for="name_search" class="form-label">
+                    <div class="mb-3 search">
+                        <label class="form-label">
                             Введите логин или имя пользователя. <br>
                             <small class="text-muted">Введите идентификатор через # для более точного поиска</small>
                         </label>
-                        <input type="search" id="name_search" name="name" placeholder="Имя#0000" class="form-control">
+                        <input type="search" id="name_search" name="name" placeholder="Имя#0000" class="form-control" autocomplete="off">
+                        <div class="search-results" style="display: none;">
+                            <ul class="list-group">
+
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="search-chosen" style="display: none;">
+                            
+                        </div>
                     </div>
                 </form>
             </div>
@@ -138,20 +149,87 @@
     $(document).ready(function() {
 
         const inviteForm = $('#inviteFriendsForm')
+        const resultsBody = inviteForm.find('.search-results')
+        const resultsList = resultsBody.find('.list-group')
+        const chosenWrapper = inviteForm.find('.search-chosen')
 
-        function searchFieldHandle() {
+        function searchFieldHandle(e) {
+            e.preventDefault()
+
+            if (!$(this).val().length) return
+
             const text = $(this).val()
             const [name, id=null] = text.split('#')
+
+            const params = {}
+
+            if (name) {params['name'] = name}
+            if (id) {params['id'] = id}
             
-            // fetch('')
+            fetch('/account/ajax-search-profiles?' + new URLSearchParams(params), {
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(resp => resp.json())
+                .then(data => {
+
+                    if (data.users.length) {
+
+                        resultsList.empty()
+                        resultsBody.show()
+
+                        data.users.forEach(function(user) {
+                            resultsList.append(
+                                `<a href="${user.profile_url}" data-user-id="${user.id}" class="list-group-item list-group-item-action">${user.username}#${user.extra_id}</a>`
+                            )
+                        })
+                    } else {
+                        resultsBody.hide()
+                    }
+                })
         }
 
-        searchFieldHandle1000 = throttle(searchFieldHandle, 1000)
+        searchFieldHandleThrottled = throttle(searchFieldHandle, 1500)
 
-        inviteForm.find('input[name="name"]').on('input', searchFieldHandle1000)
+        inviteForm.find('input[name="name"]').on('input', searchFieldHandleThrottled)
+        inviteForm.find('input[name="name"]').focus('input', function() {
+            resultsBody.show()
+        })
+
+        $(window).click(function(e) {
+            if (!$(e.target).closest('.search').length) {
+                resultsBody.hide()
+            }
+        })
+
+        resultsBody.click(function(e) {
+            e.preventDefault()
+
+            if ($(e.target).hasClass('list-group-item')) {
+
+                chosenWrapper.show()
+                
+                if (!chosenWrapper.find(`.badge:contains("${$(e.target).text()}")`).length) {
+                    chosenWrapper.append(
+                        `<a href="${$(e.target).attr('href')}" data-user-id="${$(e.target).attr('data-user-id')}" target="_blank" class="text-white badge rounded-pill bg-info text-dark">${$(e.target).text()}</a>`
+                    )
+                }
+
+                resultsBody.hide()
+            }
+
+        })
 
         $('.send-invites').click(function() {
-            //
+            
+            let userIds = []
+            chosenWrapper.find('.badge').each(function(idx, el) {
+                userIds.push(Number($(el).attr('data-user-id')))
+            })
+            console.log(userIds)
         })
     })
 </script>
