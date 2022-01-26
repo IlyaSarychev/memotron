@@ -101,7 +101,11 @@
                             <li>
                                 <a class="dropdown-item" href="#">
                                     Уведомления
-                                    <span class="badge bg-warning text-dark">4</span>
+                                    {% if new_notifications.count %}
+                                        <span class="badge bg-warning text-dark">    
+                                            {{new_notifications.count}}
+                                        </span>
+                                    {% endif %}
                                 </a>
                             </li>
                             <li>
