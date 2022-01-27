@@ -1,3 +1,4 @@
+import profile
 from django.http.response import JsonResponse
 from django.shortcuts import redirect, render
 from django.contrib.auth import views as auth_views
@@ -8,7 +9,7 @@ from django.http import HttpResponseForbidden
 from .forms import AccountLoginForm, AccountRegistrationForm
 from .models import Profile
 from .services.registration import register_new_user
-from .services.profile import change_profile_photo, search_profiles
+from .services import profile_serv
 from .services.utils.ajax import is_ajax
 
 
@@ -48,7 +49,7 @@ def account_profile(request, profile_id=None):
 def profile_change_photo(request):
     '''Изменение фото профиля из ajax-запроса'''
     if is_ajax(request):
-        success, profile = change_profile_photo(request)
+        success, profile = profile_serv.change_profile_photo(request)
         if success:
             return JsonResponse({'url': profile.photo.url})
         else:
@@ -65,7 +66,7 @@ def ajax_search_profiles(request):
     if not is_ajax(request):
         return HttpResponseForbidden()
 
-    data = search_profiles(request.GET)
+    data = profile_serv.search_profiles(request.GET)
 
     return JsonResponse(data)
 
@@ -78,3 +79,10 @@ def ajax_invite_friends(request):
 
     if not is_ajax(request):
         return HttpResponseForbidden()
+
+    user_ids = [int(id) for id in request.POST.get('user_ids').split(',')]
+    profile_serv.invite_friends(request.user, user_ids)
+
+    return JsonResponse({
+        'success': True
+    })

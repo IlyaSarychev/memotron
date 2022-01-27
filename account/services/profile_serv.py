@@ -1,6 +1,7 @@
 import os
 
 from django.contrib.auth.models import User
+from account.models import Notification
 from ..models import Profile
 from ..forms import UploadFileForm
 
@@ -53,4 +54,11 @@ def search_profiles(parameters):
 
 def invite_friends(from_user, to_users):
     '''Пригласить друзей'''
-    pass
+    
+    for user_id in to_users:
+        typeof = 'friend_adding'
+        title = f'Пользователь {from_user.first_name}#{from_user.profile.extra_id} хочет добавить вас в друзья'
+        Notification.objects.get_or_create(from_user=from_user,
+                                            user=User.objects.get(id=user_id),
+                                            typeof=typeof,
+                                            title=title)

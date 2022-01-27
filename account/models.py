@@ -38,7 +38,7 @@ class Notification(models.Model):
     title = models.CharField('Название', max_length=200)
     content = models.TextField('Содержание', null=True, blank=True)
     typeof = models.CharField('Тип уведомления', max_length=100)
-    from_user = models.OneToOneField('auth.user', 
+    from_user = models.ForeignKey('auth.user', 
                                     on_delete=models.SET_NULL, 
                                     related_name='outcome_notifications',
                                     null=True)

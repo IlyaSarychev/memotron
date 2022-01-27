@@ -229,7 +229,25 @@
             chosenWrapper.find('.badge').each(function(idx, el) {
                 userIds.push(Number($(el).attr('data-user-id')))
             })
-            console.log(userIds)
+
+            let data = new FormData()
+            data.append('user_ids', userIds)
+        
+            fetch('/account/ajax-invite-friends/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: data 
+            })
+                .then(resp => resp.json())
+                .then(data => {
+                    if (data.success) {
+                        chosenWrapper.empty()
+                        inviteForm.find('input[name="name"]').val('')
+                    }
+                })
         })
     })
 </script>
