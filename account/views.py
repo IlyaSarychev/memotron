@@ -1,13 +1,13 @@
-import profile
 from django.http.response import JsonResponse
 from django.shortcuts import redirect, render
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
+from django.views.generic import ListView
 from django.views.decorators.http import require_POST, require_GET
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseForbidden
 from .forms import AccountLoginForm, AccountRegistrationForm
-from .models import Profile
+from .models import Profile, Notification
 from .services.registration import register_new_user
 from .services import profile_serv
 from .services.utils.ajax import is_ajax
@@ -66,7 +66,7 @@ def ajax_search_profiles(request):
     if not is_ajax(request):
         return HttpResponseForbidden()
 
-    data = profile_serv.search_profiles(request.GET)
+    data = profile_serv.search_profiles(request.user, request.GET)
 
     return JsonResponse(data)
 
@@ -86,3 +86,13 @@ def ajax_invite_friends(request):
     return JsonResponse({
         'success': True
     })
+
+
+class NotificationListView(ListView):
+    '''Список уведомлений'''
+
+    context_object_name = 'notifications'
+    template_name = 'notifictation/list.html'
+
+    def get_queryset(self):
+        return Notification.objects.filter(user=self.request.user)

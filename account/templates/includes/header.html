@@ -99,7 +99,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="#">
+                                <a class="dropdown-item" href="{% url 'account:notification_list' %}">
                                     Уведомления
                                     {% if new_notifications.count %}
                                         <span class="badge bg-warning text-dark">    

@@ -44,3 +44,6 @@ class Notification(models.Model):
                                     null=True)
     is_viewed = models.BooleanField('Просмотрено', default=False)
     is_visible = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ('-created',)

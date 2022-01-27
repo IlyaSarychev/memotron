@@ -1,5 +1,7 @@
+import imp
 import os
 
+from django.urls import reverse
 from django.contrib.auth.models import User
 from account.models import Notification
 from ..models import Profile
@@ -25,7 +27,7 @@ def change_profile_photo(request):
         return False
 
 
-def search_profiles(parameters):
+def search_profiles(user, parameters):
     '''Поиск пользователей и их профилей. Необходимо передать параметры поиска (dict)'''
 
     filters = {}
@@ -36,7 +38,7 @@ def search_profiles(parameters):
         else:
             filters['first_name__istartswith'] = parameters.get('name')
 
-    users = User.objects.filter(**filters)[:10]
+    users = User.objects.filter(**filters).exclude(id=user.id)[:10]
     data = {
         'users': []
     }
@@ -57,7 +59,7 @@ def invite_friends(from_user, to_users):
     
     for user_id in to_users:
         typeof = 'friend_adding'
-        title = f'Пользователь {from_user.first_name}#{from_user.profile.extra_id} хочет добавить вас в друзья'
+        title = f'Пользователь <a href="{from_user.profile.get_absolute_url()}">{from_user.first_name}#{from_user.profile.extra_id}</a> хочет добавить вас в друзья'
         Notification.objects.get_or_create(from_user=from_user,
                                             user=User.objects.get(id=user_id),
                                             typeof=typeof,
