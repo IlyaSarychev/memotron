@@ -64,3 +64,9 @@ def invite_friends(from_user, to_users):
                                             user=User.objects.get(id=user_id),
                                             typeof=typeof,
                                             title=title)
+
+
+def set_notifications_viewed(ids):
+    '''Сделать уведомления просмотренными по их id'''
+
+    return Notification.objects.filter(id__in=ids).update(is_viewed=True)

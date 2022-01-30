@@ -13,15 +13,18 @@
                 {% if notifications %}
                 <ul class="list-group list-group-flush">
                     {% for n in notifications %}
-                        <li class="list-group-item px-0 {% if n.is_viewed %}disabled{% endif %}">
+                        <li 
+                            class="list-group-item px-0 {% if n.is_viewed %}disabled{% endif %}"
+                            data-id="{{n.id}}"
+                        >
                             <div class="d-flex">
                                 <h6 class="me-5">{{n.title|safe}}</h6>
-                                <span class="ms-auto text-nowrap">{{n.created|date:"j F H:i"}}</span>
+                                <span class="ms-auto text-nowrap">{{n.created|date:"j E H:i"}}</span>
                             </div>
                             {% if n.typeof == 'friend_adding' %}
-                            <div class="d-flex mt-1">
-                                <button class="btn btn-primary me-2">Принять</button>
-                                <button class="btn btn-danger">Отклонить</button>
+                            <div class="d-flex friend_adding mt-1">
+                                <button class="btn accept-invite btn-primary me-2" data-user-id="{{ n.from_user.id }}">Принять</button>
+                                <button class="btn reject-invite btn-danger" data-user-id="{{ n.from_user.id }}">Отклонить</button>
                             </div>
                             {% endif %}
                         </li>
@@ -34,4 +37,36 @@
         </div>
     </div>
 </main>
+{% endblock %}
+
+{% block js_scripts_after %}
+<script>
+    $(document).ready(function() {
+
+        let newNotifications = []
+
+        $('.list-group-item:not(.disabled)').each(function(idx, el) {
+            newNotifications.push(+$(el).attr('data-id'))
+        })
+
+        if (newNotifications.length) {
+            // отметить уведомления просмотренными
+            fetch('/account/ajax-notifications-set-viewed/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({notifications: newNotifications})
+            })
+        }
+        
+        $('.friend_adding .accept-invite').click(function() {
+            const id = $(this).attr('data-user-id')
+
+            // fetch()
+        })
+    })
+</script>
 {% endblock %}

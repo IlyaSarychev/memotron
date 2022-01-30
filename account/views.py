@@ -1,3 +1,5 @@
+import json
+
 from django.http.response import JsonResponse
 from django.shortcuts import redirect, render
 from django.contrib.auth import views as auth_views
@@ -6,6 +8,7 @@ from django.views.generic import ListView
 from django.views.decorators.http import require_POST, require_GET
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseForbidden
+
 from .forms import AccountLoginForm, AccountRegistrationForm
 from .models import Profile, Notification
 from .services.registration import register_new_user
@@ -96,3 +99,16 @@ class NotificationListView(ListView):
 
     def get_queryset(self):
         return Notification.objects.filter(user=self.request.user)
+
+
+@login_required
+@require_POST
+def ajax_notifications_set_viewed(request):
+    '''Сделать уведомления просмотренными'''
+
+    if not is_ajax(request):
+        return HttpResponseForbidden()
+
+    notification_ids = json.loads(request.body.decode('utf-8'))
+    profile_serv.set_notifications_viewed(notification_ids.get('notifications'))
+    return JsonResponse({'success': True})
