@@ -57,8 +57,19 @@
                             {% endif %}
                         </p>
                         <div class="d-flex overflow-auto">
-                            {% for friend in profile.frineds %}
-
+                            {% for friend in profile.friends.all %}
+                                <a href="{{ friend.get_absolute_url }}">
+                                    {% if friend.photo %}
+                                        {% thumbnail friend.photo "65x65" crop="center" as im %}
+                                        <img src="{{ im.url }}" alt="Profile photo">
+                                        {% endthumbnail %}
+                                    {% else %}
+                                        <img src="{% static 'img/no_profile_picture.png' %}" alt="No photo">
+                                    {% endif %}
+                                    <div>
+                                        {{friend.user.first_name}}
+                                    </div>
+                                </a>
                             {% empty %}
                             {% endfor %}
                         </div>

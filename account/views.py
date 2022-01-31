@@ -98,7 +98,7 @@ class NotificationListView(ListView):
     template_name = 'notifictation/list.html'
 
     def get_queryset(self):
-        return Notification.objects.filter(user=self.request.user)
+        return Notification.objects.filter(user=self.request.user, is_visible=True)
 
 
 @login_required
@@ -111,4 +111,24 @@ def ajax_notifications_set_viewed(request):
 
     notification_ids = json.loads(request.body.decode('utf-8'))
     profile_serv.set_notifications_viewed(notification_ids.get('notifications'))
+    return JsonResponse({'success': True})
+
+
+@login_required
+@require_POST
+def ajax_accept_or_reject_friend_inviting(request):
+    '''Принять запрос в друзья'''
+
+    if not is_ajax(request):
+        return HttpResponseForbidden()
+
+    data = json.loads(request.body.decode('utf-8'))
+
+    if data.get('accepted'):
+        profile_serv.accept_friend_inviting(data.get('user'), request.user)
+    else:
+        profile_serv.reject_friend_inviting(data.get('user'), request.user)
+
+    Notification.objects.filter(id=data.get('notification_id')).update(is_visible=False)
+
     return JsonResponse({'success': True})

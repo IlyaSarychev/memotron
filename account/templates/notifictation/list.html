@@ -11,10 +11,10 @@
             </div>
             <div class="col-md-8 offset-md-2">
                 {% if notifications %}
-                <ul class="list-group list-group-flush">
+                <ul class="notifications list-group list-group-flush">
                     {% for n in notifications %}
                         <li 
-                            class="list-group-item px-0 {% if n.is_viewed %}disabled{% endif %}"
+                            class="list-group-item px-0 {% if n.is_viewed %}is_viewed{% endif %}"
                             data-id="{{n.id}}"
                         >
                             <div class="d-flex">
@@ -23,8 +23,8 @@
                             </div>
                             {% if n.typeof == 'friend_adding' %}
                             <div class="d-flex friend_adding mt-1">
-                                <button class="btn accept-invite btn-primary me-2" data-user-id="{{ n.from_user.id }}">Принять</button>
-                                <button class="btn reject-invite btn-danger" data-user-id="{{ n.from_user.id }}">Отклонить</button>
+                                <button class="btn accept-invite btn-primary me-2" data-n-id="{{n.id}}" data-user-id="{{ n.from_user.id }}">Принять</button>
+                                <button class="btn reject-invite btn-danger" data-n-id="{{n.id}}" data-user-id="{{ n.from_user.id }}">Отклонить</button>
                             </div>
                             {% endif %}
                         </li>
@@ -62,10 +62,28 @@
             })
         }
         
-        $('.friend_adding .accept-invite').click(function() {
-            const id = $(this).attr('data-user-id')
+        $('.friend_adding .accept-invite, .friend_adding .reject-invite').click(function() {
+            const id = +$(this).attr('data-user-id')
 
-            // fetch()
+            fetch('/account/ajax-choose-friend-inviting/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    user: id,
+                    accepted: $(this).hasClass('accept-invite') ? true : false,
+                    notification_id: +$(this).attr('data-n-id'),
+                })
+            })
+                .then(resp => resp.json())
+                .then(data => {
+                    if (data.success) {
+                        $(this).parent().remove()
+                    }
+                })
         })
     })
 </script>

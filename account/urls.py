@@ -17,4 +17,5 @@ urlpatterns = [
     path('ajax-invite-friends/', views.ajax_invite_friends, name='ajax_invite_friends'),
     path('notifications/', views.NotificationListView.as_view(), name='notification_list'),
     path('ajax-notifications-set-viewed/', views.ajax_notifications_set_viewed, name='ajax_notifications_set_viewed'),
+    path('ajax-choose-friend-inviting/', views.ajax_accept_or_reject_friend_inviting, name='ajax_accept_or_reject_friend_inviting'),
 ]

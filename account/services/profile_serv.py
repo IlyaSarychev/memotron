@@ -70,3 +70,16 @@ def set_notifications_viewed(ids):
     '''Сделать уведомления просмотренными по их id'''
 
     return Notification.objects.filter(id__in=ids).update(is_viewed=True)
+
+
+def accept_friend_inviting(inviter_id, user):
+    '''Принять приглашение в друзья от пользователя'''
+
+    user.profile.friends.add(User.objects.get(id=inviter_id).profile)
+    return True
+
+
+def reject_friend_inviting(inviter_id, user):
+    '''Отклонить приглашение в друзья от пользователя'''
+    
+    return False

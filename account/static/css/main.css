@@ -223,3 +223,7 @@
 .search-chosen .badge {
     text-decoration: none;
 }
+
+.notifications .is_viewed h6, span {
+    opacity: .7;
+}
