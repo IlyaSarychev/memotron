@@ -38,7 +38,10 @@ def search_profiles(user, parameters):
         else:
             filters['first_name__istartswith'] = parameters.get('name')
 
-    users = User.objects.filter(**filters).exclude(id=user.id)[:10]
+    # будут исключаться существующе друзья и сам пользователь
+    users_to_exclude = [user.profile.friends.values('user__id')] + [user.id]
+
+    users = User.objects.filter(**filters).exclude(id__in=users_to_exclude)[:10]
     data = {
         'users': []
     }
